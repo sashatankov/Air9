@@ -26,9 +26,8 @@ class Air9App extends StatelessWidget {
 
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
 
-  
+  HomeScreen({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -74,13 +73,22 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Scaffold(
+        body: Column(
 
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("Upcoiming Flights"),
-        // TODO to add upcoming flights widgets
-      ],
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Upcoiming Flights"),
+              // TODO to add upcoming flights widgets
+              ],
+        ),
+        bottomNavigationBar: TabBar(
+          tabs: [
+            Tab(icon: Icons.local_airport,),
+            Tab(icon: Icons.search,), 
+            Tab(icon: Icons.account_circle)
+          ],
+        ),
     );
   }
 }
