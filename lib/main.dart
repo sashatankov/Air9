@@ -15,7 +15,7 @@ class Air9App extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: DefaultTabController(length: 3, child: HomeScreen(title: 'Air9')),
+      home: HomeScreen(title: 'Air9'),
     );
   }
 }
@@ -30,13 +30,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: HomeScreenBody(),
+        child: DefaultTabController(length: 3, child: HomeScreenBody()),
       ),
     );
   }
@@ -60,19 +54,25 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      body: TabBarView(
         children: [
-          Container(
-            child: Text(
-              "Upcoming Flights",
-              style: TextStyle(
-                fontSize: 24,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                  child: Text(
+                  "Upcoming Flights",
+                  style: TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+                padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
               ),
-            ),
-            padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
+              // TODO to add upcoming flights widgets
+            ],
           ),
-          // TODO to add upcoming flights widgets
+          Container(child:Text("search")),
+          Container(child:Text("Profile")),
         ],
       ),
       bottomNavigationBar: TabBar(
@@ -80,8 +80,8 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
           Tab(
             icon: Icon(
               Icons.local_airport, 
-            color: Colors.blue,
-            semanticLabel: "flights",
+              color: Colors.blue,
+              semanticLabel: "flights",
             ),
           ),
           Tab(
