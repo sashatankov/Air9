@@ -75,15 +75,16 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
     var times = this.widget.times;
     for (int i = 0; i < cities.length; ++i) {
       for (int j = i + 1; j < cities.length; ++j) {
-        flights.add(FlightWidget(Flight(
-            cities[i],
-            cities[j],
-            airports[cities[i]],
-            airports[cities[j]],
-            times[0],
-            times[1],
-            dates[0],
-            dates[1])));
+        flights.add(Container(
+            child: FlightWidget(Flight(
+                cities[i],
+                cities[j],
+                airports[cities[i]],
+                airports[cities[j]],
+                times[0],
+                times[1],
+                dates[0],
+                dates[1]))));
       }
     }
 
@@ -91,6 +92,7 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   }
 
   Widget getFlightsTabView() {
+    var flights = this.getFlightsList();
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -103,9 +105,14 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
           ),
           padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
         ),
-        ListView(
-          children: this.getFlightsList(),
-        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: flights.length,
+            itemBuilder: (context, position) {
+              return Card(child: flights[position]);
+            }
+          )
+        )
       ],
     );
   }

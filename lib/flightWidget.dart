@@ -40,10 +40,10 @@ class _FlightWidgetState extends State<FlightWidget> {
           Row(
             children: [
               this.departureInfo(),
-              Icon(Icons.arrow_forward),
+              Icon(Icons.arrow_forward, color: Colors.black54,),
               this.arrivalInfo()
             ],
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
           ),
           Container(child: Text("${this.connectionsMessage()}")),
         ],
@@ -66,10 +66,13 @@ class _FlightWidgetState extends State<FlightWidget> {
     return Column(
       children: [
         Text(
-            "${this.widget.flight.departureCity}"), // TODO probably increase the font
-        Text("${this.widget.flight.departureAirport}"),
+            "${this.widget.flight.departureCity}", 
+            style: TextStyle(color: Colors.black54),), // TODO probably increase the font
+        Text("${this.widget.flight.departureAirport}", 
+            style: TextStyle(color: Colors.black54)),
         Text(
-            "${this.widget.flight.departureDate}  ${this.widget.flight.departureTime}"),
+            "${this.widget.flight.departureDate}  ${this.widget.flight.departureTime}",
+            style: TextStyle(color: Colors.black54)),
       ],
     );
   }
@@ -77,10 +80,14 @@ class _FlightWidgetState extends State<FlightWidget> {
   Widget arrivalInfo() {
     return Column(
       children: [
-        Text("${this.widget.flight.arrivalCity}"), // TODO probably increase the font
-        Text("${this.widget.flight.arrivalAirport}"),
         Text(
-            "${this.widget.flight.arrivalDate}  ${this.widget.flight.arrivalTime}"),
+            "${this.widget.flight.arrivalCity}",
+            style: TextStyle(color: Colors.black54)), // TODO probably increase the font
+        Text("${this.widget.flight.arrivalAirport}",
+        style: TextStyle(color: Colors.black54)),
+        Text(
+            "${this.widget.flight.arrivalDate}  ${this.widget.flight.arrivalTime}",
+            style: TextStyle(color: Colors.black54)),
       ],
     );
   }
