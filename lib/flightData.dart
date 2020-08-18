@@ -61,7 +61,7 @@ List<Flight> randomFlights(int size) {
     var toDateString =
         "${toRandDateTime.day}/${toRandDateTime.month}/${toRandDateTime.year}";
     var toTimeString = "${toRandDateTime.hour}:${toRandDateTime.minute}";
-    
+
     var flight = Flight(
         cities[fromCityIndex],
         cities[toCityIndex],
@@ -72,6 +72,7 @@ List<Flight> randomFlights(int size) {
         fromDateString,
         toDateString);
     flights.add(flight);
+    i++;
   }
 
   return flights;
