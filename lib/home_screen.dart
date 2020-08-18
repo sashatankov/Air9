@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'flight_widget.dart';
 import 'flight_data.dart';
 
-
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key, this.title}) : super(key: key);
 
@@ -41,7 +40,11 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   }
 
   List<Widget> getFlightsList() {
-    return randomFlights(10).map((e) => FlightWidget(e)).toList();
+
+    var flights = randomFlights(10);
+    flights.sort((a, b) => a.departureAt.difference(b.departureAt).inMinutes);
+    return flights.map((e) => FlightWidget(e)).toList();
+    
   }
 
   Widget getFlightsTabView() {

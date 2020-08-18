@@ -10,7 +10,7 @@ final List<String> cities = [
 ];
 final Map<String, List<String>> airports = {
   "Tel-Aviv": ["TLV"],
-  "New-York": ["JFK", "ERW"],
+  "New-York": ["JFK", "EWR"],
   "Los-Angeles": ["LAX"],
   "Paris": ["CDG"],
   "Rome": ["FCO"]
