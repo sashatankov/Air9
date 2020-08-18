@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'flightWidget.dart';
+import 'flightData.dart';
 
 void main() {
   runApp(Air9App());
@@ -44,16 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeScreenBody extends StatefulWidget {
-  final List<String> cities = ["Tel-Aviv", "New-York", "Los-Angeles", "Paris"];
-  final Map<String, String> airports = {
-    "Tel-Aviv": "TLV",
-    "New-York": "JFK",
-    "Los-Angeles": "LAX",
-    "Paris": "CDG"
-  };
-  final List<String> dates = ["10/10/20", "1/12/21"];
-  final List<String> times = ["12:00", "22:00"];
-
   @override
   _HomeScreenBodyState createState() => _HomeScreenBodyState();
 }
@@ -68,27 +59,7 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   }
 
   List<Widget> getFlightsList() {
-    List<Widget> flights = [];
-    var cities = this.widget.cities;
-    var airports = this.widget.airports;
-    var dates = this.widget.dates;
-    var times = this.widget.times;
-    for (int i = 0; i < cities.length; ++i) {
-      for (int j = i + 1; j < cities.length; ++j) {
-        flights.add(Container(
-            child: FlightWidget(Flight(
-                cities[i],
-                cities[j],
-                airports[cities[i]],
-                airports[cities[j]],
-                times[0],
-                times[1],
-                dates[0],
-                dates[1]))));
-      }
-    }
-
-    return flights;
+    return randomFlights(10).map((e) => FlightWidget(e)).toList();
   }
 
   Widget getFlightsTabView() {
@@ -106,13 +77,11 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
           padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: flights.length,
-            itemBuilder: (context, position) {
-              return Card(child: flights[position]);
-            }
-          )
-        )
+            child: ListView.builder(
+                itemCount: flights.length,
+                itemBuilder: (context, position) {
+                  return Card(child: flights[position]);
+                }))
       ],
     );
   }

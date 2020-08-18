@@ -1,27 +1,7 @@
 import 'package:flutter/material.dart';
+import 'flight.dart';
 
-class Flight {
-  String departureCity;
-  String arrivalCity;
-  String departureAirport;
-  String arrivalAirport;
-  String departureTime;
-  String arrivalTime;
-  String departureDate;
-  String arrivalDate;
-  List<Flight> connections;
 
-  Flight(
-      this.departureCity,
-      this.arrivalCity,
-      this.departureAirport,
-      this.arrivalAirport,
-      this.departureTime,
-      this.arrivalTime,
-      this.departureDate,
-      this.arrivalDate,
-      {this.connections = const <Flight>[]});
-}
 
 class FlightWidget extends StatefulWidget {
   final Flight flight;
@@ -40,7 +20,10 @@ class _FlightWidgetState extends State<FlightWidget> {
           Row(
             children: [
               this.departureInfo(),
-              Icon(Icons.arrow_forward, color: Colors.black54,),
+              Icon(
+                Icons.arrow_forward,
+                color: Colors.black54,
+              ),
               this.arrivalInfo()
             ],
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -63,32 +46,41 @@ class _FlightWidgetState extends State<FlightWidget> {
   }
 
   Widget departureInfo() {
+    return this.locationInfoColumn(
+        this.widget.flight.departureCity,
+        this.widget.flight.departureAirport,
+        this.widget.flight.departureDate,
+        this.widget.flight.arrivalTime);
+  }
+
+  Widget arrivalInfo() {
+    return this.locationInfoColumn(
+        this.widget.flight.arrivalCity,
+        this.widget.flight.arrivalAirport,
+        this.widget.flight.arrivalDate,
+        this.widget.flight.arrivalTime);
+  }
+
+  Widget locationInfoColumn(
+      String city, String airport, String date, String time) {
     return Column(
       children: [
-        Text(
-            "${this.widget.flight.departureCity}", 
-            style: TextStyle(color: Colors.black54),), // TODO probably increase the font
-        Text("${this.widget.flight.departureAirport}", 
-            style: TextStyle(color: Colors.black54)),
-        Text(
-            "${this.widget.flight.departureDate}  ${this.widget.flight.departureTime}",
-            style: TextStyle(color: Colors.black54)),
+        Text("$city", style: this.cityStyle()),
+        Text("$airport", style: this.airportStyle()),
+        Text("$date  $time", style: this.dateStyle()),
       ],
     );
   }
 
-  Widget arrivalInfo() {
-    return Column(
-      children: [
-        Text(
-            "${this.widget.flight.arrivalCity}",
-            style: TextStyle(color: Colors.black54)), // TODO probably increase the font
-        Text("${this.widget.flight.arrivalAirport}",
-        style: TextStyle(color: Colors.black54)),
-        Text(
-            "${this.widget.flight.arrivalDate}  ${this.widget.flight.arrivalTime}",
-            style: TextStyle(color: Colors.black54)),
-      ],
-    );
+  TextStyle cityStyle() {
+    return TextStyle(color: Colors.black87, fontSize: 24);
+  }
+
+  TextStyle airportStyle() {
+    return TextStyle(color: Colors.black38, fontSize: 16);
+  }
+
+  TextStyle dateStyle() {
+    return TextStyle(color: Colors.black87, fontSize: 16);
   }
 }
