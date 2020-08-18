@@ -26,7 +26,8 @@ DateTime randomDateTime() {
   int day = random.nextInt(28) + 1;
   int hour = random.nextInt(24);
   int minute = random.nextInt(60);
-  minute = minute - (minute % 6);
+  minute = minute - (minute % 10);
+  
 
   return DateTime(year, month, day, hour, minute);
 }
@@ -52,25 +53,17 @@ List<Flight> randomFlights(int size) {
     // random departure dateTime;
     DateTime fromRandDateTime = randomDateTime();
     DateTime toRandDateTime =
-        fromRandDateTime.add(new Duration(hours: random.nextInt(10)));
+        fromRandDateTime.add(new Duration(hours: random.nextInt(10) + 1));
 
-    var fromDateString =
-        "${fromRandDateTime.day}/${fromRandDateTime.month}/${fromRandDateTime.year}";
-    var fromTimeString = "${fromRandDateTime.hour}:${fromRandDateTime.minute}";
-
-    var toDateString =
-        "${toRandDateTime.day}/${toRandDateTime.month}/${toRandDateTime.year}";
-    var toTimeString = "${toRandDateTime.hour}:${toRandDateTime.minute}";
-
+    // buildign Flight object and adding to the list
     var flight = Flight(
         cities[fromCityIndex],
         cities[toCityIndex],
         airports[cities[fromCityIndex]][fromAirportIndex],
         airports[cities[toCityIndex]][toAirportIndex],
-        fromTimeString,
-        toTimeString,
-        fromDateString,
-        toDateString);
+        fromRandDateTime,
+        toRandDateTime);
+
     flights.add(flight);
     i++;
   }

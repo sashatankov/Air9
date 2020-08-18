@@ -38,9 +38,9 @@ class _FlightWidgetState extends State<FlightWidget> {
   String connectionsMessage() {
     var numOfConnections = this.widget.flight.connections.length;
     if (numOfConnections > 1) {
-      return "${numOfConnections} connections";
+      return "$numOfConnections connections";
     } else if (numOfConnections == 1) {
-      return "${numOfConnections} connection";
+      return "$numOfConnections connection";
     }
     return "";
   }
@@ -49,8 +49,8 @@ class _FlightWidgetState extends State<FlightWidget> {
     return this.locationInfoColumn(
         this.widget.flight.departureCity,
         this.widget.flight.departureAirport,
-        this.widget.flight.departureDate,
-        this.widget.flight.arrivalTime);
+        this.widget.flight.detartureDate,
+        this.widget.flight.departureTime);
   }
 
   Widget arrivalInfo() {
