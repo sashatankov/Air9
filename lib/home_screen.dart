@@ -143,10 +143,12 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
   final _departureAtController = TextEditingController();
   final _arrivalAtController = TextEditingController();
   FlightSearchQuery _query;
+  bool isArrivalAtFieldActive;
 
   @override
   void initState() {
     this._query = FlightSearchQuery();
+    this.isArrivalAtFieldActive = true;
     super.initState();
   }
 
@@ -191,7 +193,11 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
             this._query.from = value;
           });
         },
-        onSubmitted: (value) {},
+        onSubmitted: (value) {
+          this.setState(() {
+            this._query.from = value;
+          });
+        },
       ),
     );
   }
@@ -206,7 +212,11 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
             this._query.to = value;
           });
         },
-        onSubmitted: (value) {},
+        onSubmitted: (value) {
+          this.setState(() {
+            this._query.to = value;
+          });
+        },
       ),
     );
   }
@@ -216,13 +226,11 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
       title: TextField(
         controller: this._departureAtController,
         decoration: this.departureAtDecoration(),
-        onChanged: (value) {
+        onSubmitted: (value) {
           this.setState(() {
-            this._query.departureDate =
-                DateTime.parse(value); // TODO might change later
+            this._query.departureDate = DateTime.parse(value);
           });
         },
-        onSubmitted: (value) {},
       ),
     );
   }
@@ -232,11 +240,11 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         title: TextField(
       controller: this._arrivalAtController,
       decoration: this.arrivalAtDecoration(),
-      onChanged: (value) {
-        this._query.arrivalDate =
-            DateTime.parse(value); // TODO might change later
+      enabled: this.isArrivalAtFieldActive,
+      style: TextStyle(color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26),
+      onSubmitted: (value) {
+        this._query.arrivalDate = DateTime.parse(value);
       },
-      onSubmitted: (value) {},
     ));
   }
 
@@ -247,6 +255,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         onChanged: (bool newValue) {
           this.setState(() {
             this._query.isOneWay = newValue;
+            this.isArrivalAtFieldActive = !this.isArrivalAtFieldActive;
           });
         });
   }
@@ -265,29 +274,31 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
 
   Widget searchButton() {
     return ListTile(
-        title: FlatButton(
-            color: Colors.blue,
-            textColor: Colors.white,
-            disabledColor: Colors.grey,
-            disabledTextColor: Colors.black,
-            padding: EdgeInsets.all(8),
-            onPressed: () {
-              // TODO to analyze the query
-            },
-            child: Text("Find Me Flights")));
+      title: RaisedButton(
+          color: Colors.blue,
+          textColor: Colors.white,
+          disabledColor: Colors.grey,
+          disabledTextColor: Colors.black,
+          padding: EdgeInsets.all(8),
+          onPressed: () {
+            // TODO to analyze the query
+          },
+          child: Text("Find Me Flights")),
+    );
   }
 
   InputDecoration fromDecoration() {
-    return InputDecoration(labelText: "From");
+    return InputDecoration(labelText: "From", hintText: "e.g. New York");
   }
 
   InputDecoration toDecoration() {
-    return InputDecoration(labelText: "To");
+    return InputDecoration(labelText: "To", hintText: "e.g. Rome");
   }
 
   InputDecoration departureAtDecoration() {
     return InputDecoration(
         labelText: "Departure At",
+        hintText: "DD/MM/YYYY",
         suffixIcon: FlatButton.icon(
             onPressed: () {
               this.pickDepartureDate();
@@ -299,9 +310,10 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
   InputDecoration arrivalAtDecoration() {
     return InputDecoration(
         labelText: "Arrival At",
+        hintText: "DD/MM/YYYY",
         suffixIcon: FlatButton.icon(
             onPressed: () {
-              // TODO open date picker
+              this.pickArrivalDate();
             },
             icon: Icon(Icons.calendar_today),
             label: Text("")));
@@ -323,13 +335,14 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         this._query.departureDate = value;
       });
       this._departureAtController.value =
-          TextEditingValue(text: value.toString()); // TODO to format
+          TextEditingValue(text: this.formattedDate(value));
     }).catchError((error) {
       print(error);
+      this._departureAtController.text = "";
     });
   }
 
-  void pickArrivalDate(){
+  void pickArrivalDate() {
     Future<DateTime> futureDate = showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -341,10 +354,15 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         this._query.arrivalDate = value;
       });
       this._arrivalAtController.value =
-          TextEditingValue(text: value.toString()); // TODO to format
+          TextEditingValue(text: this.formattedDate(value));
     }).catchError((error) {
       print(error);
+      this._arrivalAtController.text = "";
     });
+  }
+
+  String formattedDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year.toString().padLeft(2, '0')}";
   }
 }
 
