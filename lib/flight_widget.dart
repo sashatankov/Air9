@@ -64,23 +64,34 @@ class _FlightWidgetState extends State<FlightWidget> {
   Widget locationInfoColumn(
       String city, String airport, String date, String time) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text("$city", style: this.cityStyle()),
         Text("$airport", style: this.airportStyle()),
-        Text("$date  $time", style: this.dateStyle()),
+        Text("$date", style: this.dateStyle()),
+        Text("$time", style: this.dateStyle())
       ],
     );
   }
 
   TextStyle cityStyle() {
-    return TextStyle(color: Colors.black87, fontSize: 24);
+    return TextStyle(
+      color: Colors.black87, 
+      fontSize: 24,
+    );
   }
 
   TextStyle airportStyle() {
-    return TextStyle(color: Colors.black38, fontSize: 16);
+    return TextStyle(
+      color: Colors.black38, 
+      fontSize: 16,
+    );
   }
 
   TextStyle dateStyle() {
-    return TextStyle(color: Colors.black87, fontSize: 16);
+    return TextStyle(
+      color: Colors.black87, 
+      fontSize: 16,
+    );
   }
 }

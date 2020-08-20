@@ -64,11 +64,29 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
           padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
         ),
         Expanded(
-            child: ListView.builder(
-                itemCount: flights.length,
-                itemBuilder: (context, position) {
-                  return Card(child: flights[position]);
-                }))
+          child: ListView.separated(
+            itemCount: flights.length,
+            itemBuilder: (context, index) {
+              return Card(
+                child: flights[index],
+                margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+              );
+            },
+            separatorBuilder: (context, index) {
+              return Card(
+                child: flights[index],
+                margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                color: Colors.blue[100],
+              );
+            },
+          ),
+        )
       ],
     );
   }
@@ -78,7 +96,7 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   }
 
   Widget getProfileTabView() {
-    return Container(child: Center(child: Text("Profile"))); // TODO
+    return UserProfileWidget();
   }
 
   Widget getFlightsTab() {
@@ -237,27 +255,31 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
 
   Widget arrivalAtTextFeild() {
     return ListTile(
-        title: TextField(
-      controller: this._arrivalAtController,
-      decoration: this.arrivalAtDecoration(),
-      enabled: this.isArrivalAtFieldActive,
-      style: TextStyle(color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26),
-      onSubmitted: (value) {
-        this._query.arrivalDate = DateTime.parse(value);
-      },
-    ));
+      title: TextField(
+        controller: this._arrivalAtController,
+        decoration: this.arrivalAtDecoration(),
+        enabled: this.isArrivalAtFieldActive,
+        style: TextStyle(
+            color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26,
+        ),
+        onSubmitted: (value) {
+          this._query.arrivalDate = DateTime.parse(value);
+        },
+      ),
+    );
   }
 
   Widget oneWayCheckBox() {
     return CheckboxListTile(
-        title: const Text("One-Way"),
-        value: this._query.isOneWay,
-        onChanged: (bool newValue) {
-          this.setState(() {
-            this._query.isOneWay = newValue;
-            this.isArrivalAtFieldActive = !this.isArrivalAtFieldActive;
-          });
+      title: const Text("One-Way"),
+      value: this._query.isOneWay,
+      onChanged: (bool newValue) {
+        this.setState(() {
+          this._query.isOneWay = newValue;
+          this.isArrivalAtFieldActive = !this.isArrivalAtFieldActive;
         });
+      },
+    );
   }
 
   Widget nonStopCheckBox() {
@@ -275,15 +297,16 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
   Widget searchButton() {
     return ListTile(
       title: RaisedButton(
-          color: Colors.blue,
-          textColor: Colors.white,
-          disabledColor: Colors.grey,
-          disabledTextColor: Colors.black,
-          padding: EdgeInsets.all(8),
-          onPressed: () {
-            // TODO to analyze the query
-          },
-          child: Text("Find Me Flights")),
+        color: Colors.blue,
+        textColor: Colors.white,
+        disabledColor: Colors.grey,
+        disabledTextColor: Colors.black,
+        padding: EdgeInsets.all(8),
+        onPressed: () {
+          // TODO to analyze the query
+        },
+        child: Text("Find Me Flights"),
+      ),
     );
   }
 
@@ -297,26 +320,30 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
 
   InputDecoration departureAtDecoration() {
     return InputDecoration(
-        labelText: "Departure At",
-        hintText: "DD/MM/YYYY",
-        suffixIcon: FlatButton.icon(
-            onPressed: () {
-              this.pickDepartureDate();
-            },
-            icon: Icon(Icons.calendar_today),
-            label: Text("")));
+      labelText: "Departure At",
+      hintText: "DD/MM/YYYY",
+      suffixIcon: FlatButton.icon(
+        onPressed: () {
+          this.pickDepartureDate();
+        },
+        icon: Icon(Icons.calendar_today),
+        label: Text(""),
+      ),
+    );
   }
 
   InputDecoration arrivalAtDecoration() {
     return InputDecoration(
-        labelText: "Arrival At",
-        hintText: "DD/MM/YYYY",
-        suffixIcon: FlatButton.icon(
-            onPressed: () {
-              this.pickArrivalDate();
-            },
-            icon: Icon(Icons.calendar_today),
-            label: Text("")));
+      labelText: "Arrival At",
+      hintText: "DD/MM/YYYY",
+      suffixIcon: FlatButton.icon(
+        onPressed: () {
+          this.pickArrivalDate();
+        },
+        icon: Icon(Icons.calendar_today),
+        label: Text(""),
+      ),
+    );
   }
 
   TextStyle textStyle() {
@@ -386,7 +413,71 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      
+      child: ListView(
+        children: <Widget>[
+          this.profilePicture(),
+          this.profileName(),
+          this.profilePassportNumber(),
+          Divider(),
+          this.profileFlightMiles()
+        ],
+      ),
+    );
+  }
+
+  Widget profilePicture() {
+    return ListTile(
+      title: Icon(
+        Icons.account_circle, 
+        size: 250,
+      ),
+    );
+  }
+
+  Widget profileName() {
+    return ListTile(
+      title: Center(
+        child: Text(
+          "John Doe", 
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget profilePassportNumber() {
+    return ListTile(
+      leading: Text("Passport Number",
+        style: TextStyle(
+          color: Colors.black38, 
+          fontSize: 16,
+        ),
+      ),
+      title: Text(
+        "EF45874",
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+  Widget profileFlightMiles() {
+    return ListTile(
+      leading: Text("Miles",
+        style: TextStyle(
+          color: Colors.black38, 
+          fontSize: 16,
+        ),
+      ),
+      title: Text(
+        "35788",
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      ),
     );
   }
 }
