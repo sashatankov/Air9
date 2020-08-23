@@ -1,158 +1,32 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
 
-import 'flight_widget.dart';
-import 'flight_data.dart';
+class FlightSearchQuery {
+  String from = "";
+  String to = "";
+  DateTime departureDate = DateTime.now();
+  DateTime arrivalDate = DateTime.now();
+  bool isOneWay = false;
+  bool nonStopFlightsOnly = false;
 
-class HomeScreenController {
-  // TODO
+  FlightSearchQuery();
 }
 
-class HomeScreen extends StatefulWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
+class FlightSearchController {
+  FlightSearchQuery model;
+  FlightSearchView view;
 
-  final String title;
-
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: DefaultTabController(length: 3, child: HomeScreenBody()),
-      ),
-    );
+  FlightSearchView getView() {
+    return this.view;
   }
 }
 
-class HomeScreenBody extends StatefulWidget {
-  
+class FlightSearchView {
+  FlightSearchFormWidget widget;
 
-  @override
-  _HomeScreenBodyState createState() => _HomeScreenBodyState();
-}
+  FlightSearchView();
 
-class _HomeScreenBodyState extends State<HomeScreenBody> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: this.getHomeScreenTabView(),
-      bottomNavigationBar: this.getHomeScreenTabBar(),
-    );
-  }
-
-  List<Widget> getFlightsList() {
-    var flights = randomFlights(10);
-    flights.sort((a, b) => a.departureAt.difference(b.departureAt).inMinutes);
-    return flights.map((e) => FlightWidget(e)).toList();
-  }
-
-  Widget getFlightsTabView() {
-    var flights = this.getFlightsList();
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          child: Text(
-            "Upcoming Flights",
-            style: TextStyle(
-              fontSize: 24,
-            ),
-          ),
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
-        ),
-        Expanded(
-          child: ListView.separated(
-            itemCount: flights.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: flights[index],
-                margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-              );
-            },
-            separatorBuilder: (context, index) {
-              return Card(
-                child: flights[index],
-                margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                color: Colors.blue[100],
-              );
-            },
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget getSearchTabView() {
+  Widget getView() {
     return FlightSearchFormWidget();
-  }
-
-  Widget getProfileTabView() {
-    return UserProfileWidget();
-  }
-
-  Widget getFlightsTab() {
-    return Tab(
-      icon: Icon(
-        Icons.local_airport,
-        color: Colors.blue,
-        semanticLabel: "flights",
-      ),
-    );
-  }
-
-  Widget getSearchTab() {
-    return Tab(
-      icon: Icon(
-        Icons.search,
-        color: Colors.blue,
-        semanticLabel: "Search Flights",
-      ),
-    );
-  }
-
-  Widget getProfileTab() {
-    return Tab(
-      icon: Icon(
-        Icons.account_circle,
-        color: Colors.blue,
-        semanticLabel: "profile",
-      ),
-    );
-  }
-
-  Widget getHomeScreenTabView() {
-    return TabBarView(
-      children: <Widget>[
-        this.getFlightsTabView(),
-        this.getSearchTabView(),
-        this.getProfileTabView(),
-      ],
-    );
-  }
-
-  Widget getHomeScreenTabBar() {
-    return TabBar(
-      tabs: <Widget>[
-        this.getFlightsTab(),
-        this.getSearchTab(),
-        this.getProfileTab(),
-      ],
-    );
   }
 }
 
@@ -266,7 +140,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         decoration: this.arrivalAtDecoration(),
         enabled: this.isArrivalAtFieldActive,
         style: TextStyle(
-            color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26,
+          color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26,
         ),
         onSubmitted: (value) {
           this._query.arrivalDate = DateTime.parse(value);
@@ -396,94 +270,5 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
 
   String formattedDate(DateTime date) {
     return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year.toString().padLeft(2, '0')}";
-  }
-}
-
-class FlightSearchQuery {
-  String from = "";
-  String to = "";
-  DateTime departureDate = DateTime.now();
-  DateTime arrivalDate = DateTime.now();
-  bool isOneWay = false;
-  bool nonStopFlightsOnly = false;
-
-  FlightSearchQuery();
-}
-
-class UserProfileWidget extends StatefulWidget {
-  @override
-  _UserProfileWidgetState createState() => _UserProfileWidgetState();
-}
-
-class _UserProfileWidgetState extends State<UserProfileWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ListView(
-        children: <Widget>[
-          this.profilePicture(),
-          this.profileName(),
-          this.profilePassportNumber(),
-          Divider(),
-          this.profileFlightMiles()
-        ],
-      ),
-    );
-  }
-
-  Widget profilePicture() {
-    return ListTile(
-      title: Icon(
-        Icons.account_circle, 
-        size: 250,
-      ),
-    );
-  }
-
-  Widget profileName() {
-    return ListTile(
-      title: Center(
-        child: Text(
-          "John Doe", 
-          style: TextStyle(
-            fontSize: 24,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget profilePassportNumber() {
-    return ListTile(
-      leading: Text("Passport Number",
-        style: TextStyle(
-          color: Colors.black38, 
-          fontSize: 16,
-        ),
-      ),
-      title: Text(
-        "EF45874",
-        style: TextStyle(
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-
-  Widget profileFlightMiles() {
-    return ListTile(
-      leading: Text("Miles",
-        style: TextStyle(
-          color: Colors.black38, 
-          fontSize: 16,
-        ),
-      ),
-      title: Text(
-        "35788",
-        style: TextStyle(
-          fontSize: 16,
-        ),
-      ),
-    );
   }
 }
