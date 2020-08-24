@@ -1,27 +1,26 @@
 import 'package:Air9/flight.dart';
 import 'package:Air9/review.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 
 abstract class Account {
-  int getAccountNumber();
-  String getUsername();
-  String getPassword();
-  void setUsername(String username);
-  void setPassword(String password);
+  int get accountNumber;
+  String get username;
+  String get password;
+  set username(String username);
+  set password(String password);
 }
 
 abstract class AccountController {
-  Account getAccount();
-  AccountView getView();
+  Account get account;
+  AccountView get view;
 }
 
 abstract class AccountView {
-  Widget getView();
+  Widget get view;
 }
 
 class TravelerAccount implements Account {
-  int accountNumber;
+  int accountId;
   String firstName;
   String lastName;
   DateTime birthDate;
@@ -31,57 +30,77 @@ class TravelerAccount implements Account {
   List<Review> reviews;
 
   @override
-  int getAccountNumber() {
-    return this.accountNumber;
-  }
+  int get accountNumber => this.accountId;
 
   @override
-  String getUsername() {
-    return this.firstName + "_" + this.lastName;
-  }
+  String get username => this.firstName + "_" + this.lastName;
 
   @override
-  String getPassword() {
-    return this.firstName + "_" + this.lastName;
-  }
+  String get password => this.firstName + "_" + this.lastName;
 
   @override
-  void setUsername(String username) {}
+  set username(String username) {}
 
   @override
-  void setPassword(String password) {}
+  set password(String password) {}
 }
 
 class TravelerAccountController implements AccountController {
-  Account model;
-  AccountView view;
+  TravelerAccount model;
+  TravelerAccountView accountView;
 
-  TravelerAccountController(this.model, this.view);
-
-  @override
-  Account getAccount() {
-    return this.model;
+  TravelerAccountController(TravelerAccount model) {
+    this.model = model;
+    this.accountView = TravelerAccountView(this);
   }
 
   @override
-  AccountView getView() {
-    return this.view;
+  Account get account => this.model;
+
+  @override
+  AccountView get view => this.accountView;
+
+  void addFlight(Flight flight) {
+    this.model.flights.add(flight);
+  }
+
+  void addFlights(Iterable<Flight> flights) {
+    this.model.flights.addAll(flights);
+  }
+
+  void addReview(Review review) {
+    this.model.reviews.add(review);
+  }
+
+  void addReviews(Iterable<Review> reviews) {
+    this.model.reviews.addAll(reviews);
   }
 }
 
 class TravelerAccountView implements AccountView {
-  @override
-  Widget getView() {
-    return UserProfileWidget();
+  TravelerAccountWidget widget;
+  TravelerAccountController controller;
+
+  TravelerAccountView(TravelerAccountController controller) {
+    this.widget = TravelerAccountWidget(controller);
+    this.controller = controller;
   }
-}
 
-class UserProfileWidget extends StatefulWidget {
   @override
-  _UserProfileWidgetState createState() => _UserProfileWidgetState();
+  Widget get view => this.widget;
 }
 
-class _UserProfileWidgetState extends State<UserProfileWidget> {
+class TravelerAccountWidget extends StatefulWidget {
+  TravelerAccountController controller;
+  TravelerAccountWidget(TravelerAccountController controller) {
+    this.controller = controller;
+  }
+
+  @override
+  _TravelerAccountWidgetState createState() => _TravelerAccountWidgetState();
+}
+
+class _TravelerAccountWidgetState extends State<TravelerAccountWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -91,7 +110,11 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
           this.profileName(),
           this.profilePassportNumber(),
           Divider(),
-          this.profileFlightMiles()
+          this.profileFlightMiles(),
+          Divider(),
+          this.myFlights(),
+          Divider(),
+          this.myReviews()
         ],
       ),
     );
@@ -110,7 +133,7 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
     return ListTile(
       title: Center(
         child: Text(
-          "John Doe",
+          this.widget.controller.model.username,
           style: TextStyle(
             fontSize: 24,
           ),
@@ -153,5 +176,13 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
         ),
       ),
     );
+  }
+
+  Widget myFlights() {
+    return ListTile();
+  }
+
+  Widget myReviews() {
+    return ListTile();
   }
 }
