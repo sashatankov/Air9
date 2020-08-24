@@ -63,28 +63,52 @@ class FlightController {
 
 class FlightView {
   FlightWidget widget;
+  Flight model;
 
-  FlightView(Flight flight) {
-    this.widget = FlightWidget(flight);
+  FlightView(Flight model) {
+    this.model = model;
+    this.widget = FlightWidget(this.model);
   }
 
-  Widget getView() {
-    return this.widget;
-  }
+  Widget get view => this.widget;
 }
 
 class FlightsController {
   List<Flight> model;
   FlightsView view;
+
+  FlightsController() {
+    this.model = randomFlights(10);
+    this.view = FlightsView(this);
+  }
+
+  void add(Flight flight) {
+    this.model.add(flight);
+  }
+
+  void addAll(Iterable<Flight> flightsToAdd) {
+    this.model.addAll(flightsToAdd);
+  }
+
+  List<Flight> get flights => this.model;
 }
 
 class FlightsView {
-  List<Flight> flights;
-  FlightsView(this.flights) {}
+  FlightsController controller;
+  FlightsView(FlightsController controller) {
+    this.controller = controller;
+  }
+
+  List<FlightView> flightsView() {
+    this
+        .controller
+        .flights
+        .sort((a, b) => a.departureAt.difference(b.departureAt).inMinutes);
+    return this.controller.flights.map((e) => FlightView(e)).toList();
+  }
 
   Widget getView() {
-    flights.sort((a, b) => a.departureAt.difference(b.departureAt).inMinutes);
-    var flightsView = flights.map((e) => FlightView(e)).toList();
+    var view = this.flightsView();
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
@@ -99,10 +123,10 @@ class FlightsView {
         ),
         Expanded(
           child: ListView.separated(
-            itemCount: flights.length,
+            itemCount: view.length,
             itemBuilder: (context, index) {
               return Card(
-                child: flightsView[index].getView(),
+                child: view[index].view,
                 margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
@@ -111,7 +135,7 @@ class FlightsView {
             },
             separatorBuilder: (context, index) {
               return Card(
-                child: flightsView[index].getView(),
+                child: view[index].view,
                 margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
