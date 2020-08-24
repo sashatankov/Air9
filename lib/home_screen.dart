@@ -1,17 +1,57 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
-
 import 'flight_widget.dart';
 import 'flight_data.dart';
 
+import 'package:Air9/flight.dart';
+import 'package:Air9/account.dart';
+import 'package:Air9/flight_search.dart';
+
+class HomeScreenModel {
+  FlightsController flightsController;
+  FlightSearchController flightsSearchController;
+
+  TravelerAccount account;
+  TravelerAccountController travelerAccountController;
+
+  HomeScreenModel() {
+    this.flightsController = FlightsController();
+    this.flightsSearchController = FlightSearchController();
+    
+    // FIXME
+    this.account = TravelerAccount("John", "Snow");
+    this.account.firstName = "John";
+    this.account.lastName = "Snow";
+    this.travelerAccountController = TravelerAccountController(account);
+  }
+}
+
 class HomeScreenController {
-  // TODO
+  HomeScreenModel model;
+
+  HomeScreenController() {
+    this.model = HomeScreenModel();
+  }
+
+  Widget flightsScreen() {
+    return this.model.flightsController.view.getView();
+  }
+
+  Widget flightsSearchScreen() {
+    return this.model.flightsSearchController.view.widget;
+  }
+
+  Widget accountScreen() {
+    return this.model.travelerAccountController.accountView.widget;
+  }
 }
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
+  HomeScreenController controller;
+
+  HomeScreen(HomeScreenController controller, {Key key, this.title})
+      : super(key: key) {
+    this.controller = controller;
+  }
 
   final String title;
 
@@ -27,15 +67,21 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: DefaultTabController(length: 3, child: HomeScreenBody()),
+        child: DefaultTabController(
+          length: 3,
+          child: HomeScreenBody(this.widget.controller),
+        ),
       ),
     );
   }
 }
 
 class HomeScreenBody extends StatefulWidget {
-  
+  HomeScreenController controller;
 
+  HomeScreenBody(HomeScreenController controller) {
+    this.controller = controller;
+  }
   @override
   _HomeScreenBodyState createState() => _HomeScreenBodyState();
 }
@@ -56,53 +102,54 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   }
 
   Widget getFlightsTabView() {
-    var flights = this.getFlightsList();
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          child: Text(
-            "Upcoming Flights",
-            style: TextStyle(
-              fontSize: 24,
-            ),
-          ),
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
-        ),
-        Expanded(
-          child: ListView.separated(
-            itemCount: flights.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: flights[index],
-                margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-              );
-            },
-            separatorBuilder: (context, index) {
-              return Card(
-                child: flights[index],
-                margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                color: Colors.blue[100],
-              );
-            },
-          ),
-        )
-      ],
-    );
+    return this.widget.controller.flightsScreen();
+    // var flights = this.getFlightsList();
+    // return Column(
+    //   mainAxisAlignment: MainAxisAlignment.start,
+    //   children: <Widget>[
+    //     Container(
+    //       child: Text(
+    //         "Upcoming Flights",
+    //         style: TextStyle(
+    //           fontSize: 24,
+    //         ),
+    //       ),
+    //       padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
+    //     ),
+    //     Expanded(
+    //       child: ListView.separated(
+    //         itemCount: flights.length,
+    //         itemBuilder: (context, index) {
+    //           return Card(
+    //             child: flights[index],
+    //             margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
+    //             shape: RoundedRectangleBorder(
+    //               borderRadius: BorderRadius.circular(15.0),
+    //             ),
+    //           );
+    //         },
+    //         separatorBuilder: (context, index) {
+    //           return Card(
+    //             child: flights[index],
+    //             margin: EdgeInsets.fromLTRB(16, 4, 16, 4),
+    //             shape: RoundedRectangleBorder(
+    //               borderRadius: BorderRadius.circular(15.0),
+    //             ),
+    //             color: Colors.blue[100],
+    //           );
+    //         },
+    //       ),
+    //     )
+    //   ],
+    // );
   }
 
   Widget getSearchTabView() {
-    return FlightSearchFormWidget();
+    return this.widget.controller.flightsSearchScreen();
   }
 
   Widget getProfileTabView() {
-    return UserProfileWidget();
+    return this.widget.controller.accountScreen();
   }
 
   Widget getFlightsTab() {
@@ -266,7 +313,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         decoration: this.arrivalAtDecoration(),
         enabled: this.isArrivalAtFieldActive,
         style: TextStyle(
-            color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26,
+          color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26,
         ),
         onSubmitted: (value) {
           this._query.arrivalDate = DateTime.parse(value);
@@ -434,7 +481,7 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
   Widget profilePicture() {
     return ListTile(
       title: Icon(
-        Icons.account_circle, 
+        Icons.account_circle,
         size: 250,
       ),
     );
@@ -444,7 +491,7 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
     return ListTile(
       title: Center(
         child: Text(
-          "John Doe", 
+          "John Doe",
           style: TextStyle(
             fontSize: 24,
           ),
@@ -455,9 +502,10 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
 
   Widget profilePassportNumber() {
     return ListTile(
-      leading: Text("Passport Number",
+      leading: Text(
+        "Passport Number",
         style: TextStyle(
-          color: Colors.black38, 
+          color: Colors.black38,
           fontSize: 16,
         ),
       ),
@@ -472,9 +520,10 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
 
   Widget profileFlightMiles() {
     return ListTile(
-      leading: Text("Miles",
+      leading: Text(
+        "Miles",
         style: TextStyle(
-          color: Colors.black38, 
+          color: Colors.black38,
           fontSize: 16,
         ),
       ),
