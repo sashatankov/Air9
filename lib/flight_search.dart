@@ -15,22 +15,66 @@ class FlightSearchController {
   FlightSearchQuery model;
   FlightSearchView view;
 
+  FlightSearchController() {
+    this.model = FlightSearchQuery();
+    this.view = FlightSearchView(this);
+  }
+
   FlightSearchView getView() {
     return this.view;
+  }
+
+  set flightFrom(String location) => this.model.from = location;
+
+  set flightTo(String location) => this.model.to = location;
+
+  set departureDate(DateTime date) => this.model.departureDate = date;
+
+  set arrivalDate(DateTime date) => this.model.arrivalDate = date;
+
+  set isOneWay(bool value) => this.model.isOneWay = value;
+
+  set nonStopFlightsOnly(bool value) => this.model.nonStopFlightsOnly = value;
+
+  String get flightFrom => this.model.from;
+
+  String get flightTo => this.model.to;
+
+  DateTime get departureDate => this.model.departureDate;
+
+  DateTime get arrivalDate => this.model.arrivalDate;
+
+  bool get isOneWay => this.model.isOneWay;
+
+  bool get nonStopFlightsOnly => this.model.nonStopFlightsOnly;
+
+  void printUserInput() {
+    print("From: ${this.flightFrom}");
+    print("To: ${this.flightTo}");
+    print("Departure Date: ${this.departureDate.toString()}");
+    print("Arrival Date: ${this.arrivalDate.toString()}");
+    print("One Way: ${this.isOneWay}");
+    print("Non Stop: ${this.nonStopFlightsOnly}");
   }
 }
 
 class FlightSearchView {
   FlightSearchFormWidget widget;
+  FlightSearchController controller;
 
-  FlightSearchView();
-
-  Widget getView() {
-    return FlightSearchFormWidget();
+  FlightSearchView(FlightSearchController controller) {
+    this.widget = FlightSearchFormWidget(controller);
+    this.controller = controller;
   }
 }
 
 class FlightSearchFormWidget extends StatefulWidget {
+  FlightSearchController controller;
+
+  FlightSearchFormWidget(FlightSearchController controller) {
+    this.controller = controller;
+  }
+
   @override
   _FlightSearchFormWidgetState createState() => _FlightSearchFormWidgetState();
 }
@@ -40,12 +84,10 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
   final _toController = TextEditingController();
   final _departureAtController = TextEditingController();
   final _arrivalAtController = TextEditingController();
-  FlightSearchQuery _query;
   bool isArrivalAtFieldActive;
 
   @override
   void initState() {
-    this._query = FlightSearchQuery();
     this.isArrivalAtFieldActive = true;
     super.initState();
   }
@@ -88,12 +130,12 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         decoration: this.fromDecoration(),
         onChanged: (String value) {
           this.setState(() {
-            this._query.from = value;
+            this.widget.controller.flightFrom = value;
           });
         },
         onSubmitted: (value) {
           this.setState(() {
-            this._query.from = value;
+            this.widget.controller.flightFrom = value;
           });
         },
       ),
@@ -107,12 +149,12 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         decoration: this.toDecoration(),
         onChanged: (value) {
           this.setState(() {
-            this._query.to = value;
+            this.widget.controller.flightTo = value;
           });
         },
         onSubmitted: (value) {
           this.setState(() {
-            this._query.to = value;
+            this.widget.controller.flightTo = value;
           });
         },
       ),
@@ -126,7 +168,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         decoration: this.departureAtDecoration(),
         onSubmitted: (value) {
           this.setState(() {
-            this._query.departureDate = DateTime.parse(value);
+            this.widget.controller.departureDate = DateTime.parse(value);
           });
         },
       ),
@@ -143,7 +185,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
           color: this.isArrivalAtFieldActive ? Colors.black : Colors.black26,
         ),
         onSubmitted: (value) {
-          this._query.arrivalDate = DateTime.parse(value);
+          this.widget.controller.arrivalDate = DateTime.parse(value);
         },
       ),
     );
@@ -152,10 +194,10 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
   Widget oneWayCheckBox() {
     return CheckboxListTile(
       title: const Text("One-Way"),
-      value: this._query.isOneWay,
+      value: this.widget.controller.isOneWay,
       onChanged: (bool newValue) {
         this.setState(() {
-          this._query.isOneWay = newValue;
+          this.widget.controller.isOneWay = newValue;
           this.isArrivalAtFieldActive = !this.isArrivalAtFieldActive;
         });
       },
@@ -165,10 +207,10 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
   Widget nonStopCheckBox() {
     return CheckboxListTile(
       title: const Text("Non-Stop flights only"),
-      value: this._query.nonStopFlightsOnly,
+      value: this.widget.controller.nonStopFlightsOnly,
       onChanged: (bool value) {
         this.setState(() {
-          this._query.nonStopFlightsOnly = value;
+          this.widget.controller.nonStopFlightsOnly = value;
         });
       },
     );
@@ -184,6 +226,8 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         padding: EdgeInsets.all(8),
         onPressed: () {
           // TODO to analyze the query
+          // Test prints input to the console with controller
+          this.widget.controller.printUserInput();
         },
         child: Text("Find Me Flights"),
       ),
@@ -239,7 +283,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
 
     futureDate.then((DateTime value) {
       this.setState(() {
-        this._query.departureDate = value;
+        this.widget.controller.departureDate = value;
       });
       this._departureAtController.value =
           TextEditingValue(text: this.formattedDate(value));
@@ -251,14 +295,15 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
 
   void pickArrivalDate() {
     Future<DateTime> futureDate = showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2099, 12, 31));
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2099, 12, 31),
+    );
 
     futureDate.then((DateTime value) {
       this.setState(() {
-        this._query.arrivalDate = value;
+        this.widget.controller.arrivalDate = value;
       });
       this._arrivalAtController.value =
           TextEditingValue(text: this.formattedDate(value));
