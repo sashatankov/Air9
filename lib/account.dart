@@ -29,14 +29,18 @@ class TravelerAccount implements Account {
   List<Flight> flights;
   List<Review> reviews;
 
+  TravelerAccount(String firstName, String lastName) {
+    this.firstName = "JOhn";
+  }
+
   @override
   int get accountNumber => this.accountId;
 
   @override
-  String get username => this.firstName + "_" + this.lastName;
+  String get username => "${this.firstName}";
 
   @override
-  String get password => this.firstName + "_" + this.lastName;
+  String get password => "${this.firstName} ${this.lastName}";
 
   @override
   set username(String username) {}
@@ -91,10 +95,8 @@ class TravelerAccountView implements AccountView {
 }
 
 class TravelerAccountWidget extends StatefulWidget {
-  TravelerAccountController controller;
-  TravelerAccountWidget(TravelerAccountController controller) {
-    this.controller = controller;
-  }
+  final TravelerAccountController controller;
+  TravelerAccountWidget(this.controller) {}
 
   @override
   _TravelerAccountWidgetState createState() => _TravelerAccountWidgetState();
@@ -133,7 +135,7 @@ class _TravelerAccountWidgetState extends State<TravelerAccountWidget> {
     return ListTile(
       title: Center(
         child: Text(
-          this.widget.controller.model.username,
+          "John",
           style: TextStyle(
             fontSize: 24,
           ),

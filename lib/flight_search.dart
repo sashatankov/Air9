@@ -69,11 +69,9 @@ class FlightSearchView {
 }
 
 class FlightSearchFormWidget extends StatefulWidget {
-  FlightSearchController controller;
+  final FlightSearchController controller;
 
-  FlightSearchFormWidget(FlightSearchController controller) {
-    this.controller = controller;
-  }
+  FlightSearchFormWidget(this.controller) {}
 
   @override
   _FlightSearchFormWidgetState createState() => _FlightSearchFormWidgetState();
