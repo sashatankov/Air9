@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'package:Air9/src/home_screen.dart';
 
 void main() {
   AppController appController = AppController();
@@ -15,11 +15,9 @@ class AppController {
 }
 
 class Air9App extends StatelessWidget {
-  AppController appController;
+  final AppController appController;
 
-  Air9App(AppController controller) {
-    this.appController = controller;
-  }
+  Air9App(this.appController);
   // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
@@ -30,7 +28,8 @@ class Air9App extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: HomeScreen(this.appController.homeScreenController, title: 'Air9'),
+        home:
+            HomeScreen(this.appController.homeScreenController, title: 'Air9'),
       ),
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
