@@ -5,18 +5,17 @@ import 'package:flutter/material.dart';
 abstract class Account {
   int get accountNumber;
   String get username;
-  String get password;
-  set username(String username);
-  set password(String password);
-}
-
-abstract class AccountController {
-  Account get account;
-  AccountView get view;
+  // TODO to add a profile picture;
 }
 
 abstract class AccountView {
-  Widget get view;
+  Widget render();
+}
+
+abstract class AccountController {
+  void updateView();
+  Account get model;
+  AccountView get view;
 }
 
 class TravelerAccount implements Account {
@@ -26,80 +25,75 @@ class TravelerAccount implements Account {
   DateTime birthDate;
   String nationality;
   String phoneNumber;
+  String email;
   List<Flight> flights;
   List<Review> reviews;
 
-  TravelerAccount(String firstName, String lastName) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    print(this.firstName);
-    print(this.lastName);
-  }
+  TravelerAccount(this.firstName, this.lastName, this.birthDate,
+      this.nationality, this.phoneNumber,
+      {this.flights = const <Flight>[], this.reviews = const <Review>[]});
 
   @override
   int get accountNumber => this.accountId;
 
   @override
   String get username => "${this.firstName} ${this.lastName}";
-
-  @override
-  String get password => "${this.firstName} ${this.lastName}";
-
-  @override
-  set username(String username) {}
-
-  @override
-  set password(String password) {}
 }
 
 class TravelerAccountController implements AccountController {
-  TravelerAccount model;
+  TravelerAccount travelerAccountModel;
   TravelerAccountView accountView;
 
-  TravelerAccountController(TravelerAccount model) {
-    this.model = model;
-    this.accountView = TravelerAccountView(this);
+  TravelerAccountController(this.travelerAccountModel) {
+    this.accountView = TravelerAccountView(this.travelerAccountModel);
   }
 
   @override
-  Account get account => this.model;
+  void updateView() {
+    this.accountView = TravelerAccountView(this.travelerAccountModel);
+  }
+
+  @override
+  Account get model => this.travelerAccountModel;
 
   @override
   AccountView get view => this.accountView;
 
   void addFlight(Flight flight) {
-    this.model.flights.add(flight);
+    this.travelerAccountModel.flights.add(flight);
   }
 
   void addFlights(Iterable<Flight> flights) {
-    this.model.flights.addAll(flights);
+    this.travelerAccountModel.flights.addAll(flights);
   }
 
   void addReview(Review review) {
-    this.model.reviews.add(review);
+    this.travelerAccountModel.reviews.add(review);
   }
 
   void addReviews(Iterable<Review> reviews) {
-    this.model.reviews.addAll(reviews);
+    this.travelerAccountModel.reviews.addAll(reviews);
   }
 }
 
 class TravelerAccountView implements AccountView {
   TravelerAccountWidget widget;
-  TravelerAccountController controller;
+  TravelerAccount model;
 
-  TravelerAccountView(TravelerAccountController controller) {
-    this.widget = TravelerAccountWidget(controller);
-    this.controller = controller;
+  TravelerAccountView(TravelerAccount model) {
+    this.widget = TravelerAccountWidget(model);
+    this.model = model;
   }
 
   @override
-  Widget get view => this.widget;
+  Widget render() {
+    return this.widget;
+  }
 }
 
 class TravelerAccountWidget extends StatefulWidget {
-  final TravelerAccountController controller;
-  TravelerAccountWidget(this.controller);
+  final TravelerAccount model;
+  TravelerAccountWidget(this.model);
 
   @override
   _TravelerAccountWidgetState createState() => _TravelerAccountWidgetState();
@@ -138,7 +132,7 @@ class _TravelerAccountWidgetState extends State<TravelerAccountWidget> {
     return ListTile(
       title: Center(
         child: Text(
-          this.widget.controller.model.username,
+          this.widget.model.username,
           style: TextStyle(
             fontSize: 24,
           ),
@@ -184,10 +178,10 @@ class _TravelerAccountWidgetState extends State<TravelerAccountWidget> {
   }
 
   Widget myFlights() {
-    return ListTile();
+    return ListTile(title: Text("My Flights"));
   }
 
   Widget myReviews() {
-    return ListTile();
+    return ListTile(title: Text("My Reviews"));
   }
 }
