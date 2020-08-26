@@ -10,36 +10,29 @@ class HomeScreenModel {
   FlightsController flightsController;
   FlightSearchController flightsSearchController;
 
-  TravelerAccount account;
-  TravelerAccountController travelerAccountController;
+  AccountController accountController;
 
-  HomeScreenModel() {
-    this.flightsController = FlightsController();
+  HomeScreenModel(this.flightsController, 
+  this.accountController, this.flightsSearchController) {
     this.flightsSearchController = FlightSearchController();
-
-    // FIXME
-    this.account = TravelerAccount("John", "Snow");
-    this.travelerAccountController = TravelerAccountController(account);
   }
 }
 
 class HomeScreenController {
   HomeScreenModel model;
 
-  HomeScreenController() {
-    this.model = HomeScreenModel();
-  }
+  HomeScreenController(this.model);
 
   Widget flightsScreen() {
-    return this.model.flightsController.view.getView();
+    return this.model.flightsController.view.render();
   }
 
   Widget flightsSearchScreen() {
-    return this.model.flightsSearchController.view.widget;
+    return this.model.flightsSearchController.view.render();
   }
 
   Widget accountScreen() {
-    return this.model.travelerAccountController.accountView.widget;
+    return this.model.accountController.view.render();
   }
 }
 
@@ -156,6 +149,4 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
       ],
     );
   }
-
-
 }
