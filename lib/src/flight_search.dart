@@ -13,15 +13,17 @@ class FlightSearchQuery {
 
 class FlightSearchController {
   FlightSearchQuery model;
-  FlightSearchView view;
+  FlightSearchView flightSearchView;
 
   FlightSearchController() {
     this.model = FlightSearchQuery();
-    this.view = FlightSearchView(this);
+    this.flightSearchView = FlightSearchView(this);
   }
 
-  FlightSearchView getView() {
-    return this.view;
+  FlightSearchView get view => this.flightSearchView;
+
+  void updateView() {
+    this.flightSearchView = FlightSearchView(this);
   }
 
   set flightFrom(String location) => this.model.from = location;
@@ -56,6 +58,10 @@ class FlightSearchController {
     print("One Way: ${this.isOneWay}");
     print("Non Stop: ${this.nonStopFlightsOnly}");
   }
+
+  void analyzeSearchQuery() {
+    // TODO
+  }
 }
 
 class FlightSearchView {
@@ -65,6 +71,10 @@ class FlightSearchView {
   FlightSearchView(FlightSearchController controller) {
     this.widget = FlightSearchFormWidget(controller);
     this.controller = controller;
+  }
+
+  Widget render() {
+    return this.widget;
   }
 }
 
@@ -223,9 +233,8 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         disabledTextColor: Colors.black,
         padding: EdgeInsets.all(8),
         onPressed: () {
-          // TODO to analyze the query
-          // Test prints input to the console with controller
-          this.widget.controller.printUserInput();
+          this.widget.controller.printUserInput(); // this is a test to console
+          this.widget.controller.analyzeSearchQuery();
         },
         child: Text("Find Me Flights"),
       ),
