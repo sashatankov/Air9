@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'flight.dart';
 
 
-
+/// a widget class to diplay the flight details of the upcoming flight
 class FlightWidget extends StatefulWidget {
   final Flight flight;
   FlightWidget(this.flight);
@@ -11,6 +11,7 @@ class FlightWidget extends StatefulWidget {
   _FlightWidgetState createState() => _FlightWidgetState();
 }
 
+/// a state class for the [FlightWidget]
 class _FlightWidgetState extends State<FlightWidget> {
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,8 @@ class _FlightWidgetState extends State<FlightWidget> {
     );
   }
 
+  /// return a message about the number of connecting flights of a flight
+  /// empty string is returned if there are no connections
   String connectionsMessage() {
     var numOfConnections = this.widget.flight.connections.length;
     if (numOfConnections > 1) {
@@ -45,6 +48,8 @@ class _FlightWidgetState extends State<FlightWidget> {
     return "";
   }
 
+  /// returns the info about the departure of the flight
+  /// e.g city, airport, date, time of departure
   Widget departureInfo() {
     return this.locationInfoColumn(
         this.widget.flight.departureCity,
@@ -53,6 +58,8 @@ class _FlightWidgetState extends State<FlightWidget> {
         this.widget.flight.departureTime);
   }
 
+  /// returns the info about the arrival of the flight
+  /// e.g city, airport, date, time
   Widget arrivalInfo() {
     return this.locationInfoColumn(
         this.widget.flight.arrivalCity,
@@ -60,7 +67,8 @@ class _FlightWidgetState extends State<FlightWidget> {
         this.widget.flight.arrivalDate,
         this.widget.flight.arrivalTime);
   }
-
+  
+  /// returns the given info as a [Column] widget
   Widget locationInfoColumn(
       String city, String airport, String date, String time) {
     return Column(
@@ -74,6 +82,7 @@ class _FlightWidgetState extends State<FlightWidget> {
     );
   }
 
+  /// returns a style for the departure/arrival cityies of the flight
   TextStyle cityStyle() {
     return TextStyle(
       color: Colors.black87, 
@@ -81,6 +90,7 @@ class _FlightWidgetState extends State<FlightWidget> {
     );
   }
 
+  /// returns a style for the departure/arrival airports of the flight
   TextStyle airportStyle() {
     return TextStyle(
       color: Colors.black38, 
@@ -88,6 +98,7 @@ class _FlightWidgetState extends State<FlightWidget> {
     );
   }
 
+  /// returns a style for the departure/arrival dates of the flights
   TextStyle dateStyle() {
     return TextStyle(
       color: Colors.black87, 
