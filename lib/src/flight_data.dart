@@ -19,6 +19,7 @@ final Map<String, List<String>> airports = {
 final List<String> dates = ["10/10/20", "1/12/21"];
 final List<String> times = ["12:00", "22:00"];
 
+/// returns a random date between 1/1/2020 to 31/12/2030
 DateTime randomDateTime() {
   var random = Random();
   int year = random.nextInt(10) + 2020;
@@ -32,6 +33,7 @@ DateTime randomDateTime() {
   return DateTime(year, month, day, hour, minute);
 }
 
+/// return a list of randomly generated flights of a given size
 List<Flight> randomFlights(int size) {
   List<Flight> flights = [];
   var random = Random();
