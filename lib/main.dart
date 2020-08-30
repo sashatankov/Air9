@@ -29,11 +29,13 @@ void main() {
   runApp(Air9App(appController));
 }
 
+/// a controller class for the app
 class AppController {
   HomeScreenController homeScreenController;
   AppController(this.homeScreenController);
 }
 
+/// app widget class
 class Air9App extends StatelessWidget {
   final AppController appController;
 
