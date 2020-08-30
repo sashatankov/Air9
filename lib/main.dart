@@ -8,7 +8,7 @@ import 'package:Air9/src/home_screen.dart';
 
 void main() {
   var flights = randomFlights(10);
-  Flights flightsModel = Flights(flights);
+  Flights flightsModel = Flights.of(flights);
   FlightsController flightsCotroller = FlightsController(flightsModel);
 
   TravelerAccount account = randomTravelerAccount();
