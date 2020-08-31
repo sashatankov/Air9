@@ -7,26 +7,34 @@ import 'package:flutter/material.dart';
 import 'package:Air9/src/home_screen.dart';
 
 void main() {
-  var flights = randomFlights(10);
-  Flights flightsModel = Flights.of(flights);
-  FlightsController flightsCotroller = FlightsController(flightsModel);
+  Air9App app = Air9App();
+  app.run();
+}
 
-  TravelerAccount account = randomTravelerAccount();
-  TravelerAccountController accountcontroller =
-      TravelerAccountController(account);
+/// the main class of the app
+class Air9App {
 
-  FlightSearchController flightSearchController = FlightSearchController();
+  /// initializes the app and runs the app
+  void run() {
+    var flights = randomFlights(10);
+    Flights flightsModel = Flights.of(flights);
+    FlightsController flightsCotroller = FlightsController(flightsModel);
 
-  HomeScreenModel homeScreenModel = HomeScreenModel(
-    flightsCotroller, 
-    accountcontroller, 
-    flightSearchController);
-  HomeScreenController homeScreenController =
-      HomeScreenController(homeScreenModel);
-      
-  AppController appController = AppController(homeScreenController);
+    TravelerAccount account = randomTravelerAccount();
+    TravelerAccountController accountcontroller =
+        TravelerAccountController(account);
 
-  runApp(Air9App(appController));
+    FlightSearchController flightSearchController = FlightSearchController();
+
+    HomeScreenModel homeScreenModel = HomeScreenModel(
+        flightsCotroller, accountcontroller, flightSearchController);
+    HomeScreenController homeScreenController =
+        HomeScreenController(homeScreenModel);
+
+    AppController appController = AppController(homeScreenController);
+
+    runApp(Air9AppWidget(appController));
+  }
 }
 
 /// a controller class for the app
@@ -36,10 +44,10 @@ class AppController {
 }
 
 /// app widget class
-class Air9App extends StatelessWidget {
+class Air9AppWidget extends StatelessWidget {
   final AppController appController;
 
-  Air9App(this.appController);
+  Air9AppWidget(this.appController);
   // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
