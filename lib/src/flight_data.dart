@@ -16,8 +16,21 @@ final Map<String, List<String>> airports = {
   "Rome": ["FCO"]
 };
 
-final List<String> dates = ["10/10/20", "1/12/21"];
-final List<String> times = ["12:00", "22:00"];
+final List<String> airlines = [
+  "Delta Airlines",
+  "Lufthansa",
+  "Turkish Airlines",
+  "KLM",
+  "American Airlines"
+];
+
+final Map<String, List<String>> flightNumbers = {
+  "Delta Airlines": ["DL7482", "DL6577"],
+  "Lufthansa": ["LF1933", "LF221"],
+  "Turkish Airlines": ["TA4552", "TA120"],
+  "KLM": ["KL338", "KL2243"],
+  "American Airlines": ["AA3009", "AA1173"]
+};
 
 /// returns a random date between 1/1/2020 to 31/12/2030
 DateTime randomDateTime() {
@@ -28,7 +41,6 @@ DateTime randomDateTime() {
   int hour = random.nextInt(24);
   int minute = random.nextInt(60);
   minute = minute - (minute % 10);
-  
 
   return DateTime(year, month, day, hour, minute);
 }
@@ -38,15 +50,22 @@ List<Flight> randomFlights(int size) {
   List<Flight> flights = [];
   var random = Random();
   var i = 0;
-  int fromCityIndex, toCityIndex, fromAirportIndex, toAirportIndex;
+  int flightNumberIndex,
+      fromCityIndex,
+      toCityIndex,
+      fromAirportIndex,
+      toAirportIndex,
+      airlineIndex;
 
   while (i < size) {
-    // random pair of cities, departure != arrival
+    // random tuple of flightNumber, cities, departure != arrival, airline
+    airlineIndex = random.nextInt(airlines.length);
     fromCityIndex = random.nextInt(cities.length);
     toCityIndex = random.nextInt(cities.length);
     while (fromCityIndex == toCityIndex) {
       toCityIndex = random.nextInt(cities.length);
     }
+    flightNumberIndex = random.nextInt(flightNumbers[airlines[airlineIndex]].length);
 
     // random airport in each city
     fromAirportIndex = random.nextInt(airports[cities[fromCityIndex]].length);
@@ -57,14 +76,16 @@ List<Flight> randomFlights(int size) {
     DateTime toRandDateTime =
         fromRandDateTime.add(new Duration(hours: random.nextInt(10) + 1));
 
-    // buildign Flight object and adding to the list
+    // building Flight object and adding to the list
     var flight = Flight(
+        flightNumbers[airlines[airlineIndex]][flightNumberIndex],
         cities[fromCityIndex],
         cities[toCityIndex],
         airports[cities[fromCityIndex]][fromAirportIndex],
         airports[cities[toCityIndex]][toAirportIndex],
         fromRandDateTime,
-        toRandDateTime);
+        toRandDateTime,
+        airlines[airlineIndex]);
 
     flights.add(flight);
     i++;

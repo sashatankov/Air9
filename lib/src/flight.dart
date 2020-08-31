@@ -1,22 +1,21 @@
 import 'package:Air9/src/flight_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:Air9/src/flight_data.dart';
 
 /// a class represents a commercial flight
 /// and stores data about the flight
 class Flight {
+  String flightNumber;
   String departureCity;
   String arrivalCity;
   String departureAirport;
   String arrivalAirport;
   DateTime departureAt;
   DateTime arrivalAt;
-  List<Flight> connections;
+  String airline;
 
   /// a constructor of the class
-  Flight(this.departureCity, this.arrivalCity, this.departureAirport,
-      this.arrivalAirport, this.departureAt, this.arrivalAt,
-      {this.connections = const <Flight>[]});
+  Flight(this.flightNumber, this.departureCity, this.arrivalCity, this.departureAirport,
+      this.arrivalAirport, this.departureAt, this.arrivalAt, this.airline);
 
   /// returns a string representation of the date of departure of the flight
   String get detartureDate {
@@ -75,7 +74,13 @@ class FlightController {
   /// returns the string representation of the time of arrival of flight
   String get arrivalTime => this.model.arrivalTime;
 
-  // updates the view og the flight with the current model
+  /// returns the flight number
+  String get flightNumber => this.model.flightNumber;
+
+  ///
+  String get airline => this.model.airline;
+
+  /// updates the view og the flight with the current model
   void updateView() {
     this.view = FlightView(this.model);
   }

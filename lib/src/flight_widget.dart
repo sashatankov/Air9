@@ -29,24 +29,12 @@ class _FlightWidgetState extends State<FlightWidget> {
             ],
             mainAxisAlignment: MainAxisAlignment.spaceAround,
           ),
-          Container(child: Text("${this.connectionsMessage()}")),
         ],
       ),
       padding: EdgeInsets.all(16),
     );
   }
 
-  /// return a message about the number of connecting flights of a flight
-  /// empty string is returned if there are no connections
-  String connectionsMessage() {
-    var numOfConnections = this.widget.flight.connections.length;
-    if (numOfConnections > 1) {
-      return "$numOfConnections connections";
-    } else if (numOfConnections == 1) {
-      return "$numOfConnections connection";
-    }
-    return "";
-  }
 
   /// returns the info about the departure of the flight
   /// e.g city, airport, date, time of departure
