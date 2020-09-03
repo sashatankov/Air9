@@ -36,7 +36,7 @@ String resultsLanguage = "en-US"}) {
 
 }
 
-String getPlacesURL(String placename, {String userLocationCountry = "US", String resultsCurrency = "USD", String resultsLanguage = "en-US"}) {
-  return "${rapidApiHosts[skyScannerStr]}/apiservices/autosuggest/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/?query=$placename";
+String getAirportsURL(String placeName, {String userLocationCountry = "US", String resultsCurrency = "USD", String resultsLanguage = "en-US"}) {
+  return "${rapidApiHosts[tripAdvisorStr]}/airports/search/?locale=$resultsLanguage&query=$placeName";
 }
 
