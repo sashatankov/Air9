@@ -21,17 +21,26 @@ class FlightSearchResult {
       String arrivalAirport,
       DateTime departureAt,
       DateTime arrivalAt,
-      String airline,
+      String carrier,
       String price) {
     this.flight = Flight(flightNumber, departureCity, arrivalCity,
-        departureAirport, arrivalAirport, departureAt, arrivalAt, airline);
+        departureAirport, arrivalAirport, departureAt, arrivalAt, carrier);
     this.price = price;
   }
 
   /// factory constructor that builds the object based on the data
   /// passed as a JSON
   factory FlightSearchResult.fromJSON(Map<String, dynamic> json) {
-    return FlightSearchResult(); // TODO: to parse the json
+    return FlightSearchResult(
+        json["Flight Number"],
+        json['Departure City'],
+        json["Arrival City"],
+        json["Departure Airport"],
+        json["Arrival Airport"],
+        DateTime.parse(json["Departure Time"]),
+        DateTime.parse(json["Arrival Time"]),
+        json["Carrier"],
+        json["Price"]);
   }
 }
 
@@ -45,10 +54,21 @@ class FlightSearchResults {
     this.searchResults = List<FlightSearchResult>();
   }
 
+  /// a constructor the builds the object from a given collection of [FlightSearchResult]
+  FlightSearchResults.fromCollection(Iterable<FlightSearchResult> collection) {
+    this.searchResults = List<FlightSearchResult>();
+    this.searchResults.addAll(collection);
+  }
+
   /// factory method that build a collection of [FlightSearchResult] objects
   /// from a JSON
   factory FlightSearchResults.fromJSON(List<Map<String, dynamic>> json) {
-    // TODO:
+    List<FlightSearchResult> results = List<FlightSearchResult>();
+    for (var entry in json) {
+      results.add(FlightSearchResult.fromJSON(entry));
+    }
+
+    return FlightSearchResults.fromCollection(results);
   }
 
   /// return the size of the collection
@@ -75,7 +95,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     return Card();
   }
 
-  /// returns the data about the search result as a [FlightSearchResult] a.k.a 
+  /// returns the data about the search result as a [FlightSearchResult] a.k.a
   /// the model og the widget
   FlightSearchResult get model => this.widget.model;
 
@@ -92,7 +112,7 @@ class FlightSearchResultsWidget extends StatefulWidget {
   /// a constructor for the class
   FlightSearchResultsWidget(this.model, {Key key, this.title})
       : super(key: key);
-  
+
   @override
   _FlightSearchResultsWidgetState createState() =>
       _FlightSearchResultsWidgetState();
@@ -109,13 +129,13 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
       },
     );
   }
+
   /// returns the data about the search result
   FlightSearchResults get model => this.widget.model;
 
   /// returns a list of search results
   List<FlightSearchResult> get searchResults => this.model.searchResults;
 }
-
 
 /// a widget class representing the entire search results screen
 class FlightSearchResultsScreenWidget extends StatefulWidget {
