@@ -32,10 +32,10 @@ Future<FlightSearchResults> fetchFlights(FlightSearchQuery query) async {
           originCode, destinationCode, formattedDate(query.departureDate)));
     }
   }
-  List<Map<String, String>> data = List<Map<String, dynamic>>();
+  List<Map<String, dynamic>> data = List<Map<String, dynamic>>();
   for (String url in urls) {
     final dynamic response = await http.get(url);
-    List<Map<String, String>> flightEntries = jsonFromResponse(response);
+    List<Map<String, dynamic>> flightEntries = jsonFromResponse(response);
     data.addAll(flightEntries);
   }
 
@@ -51,7 +51,7 @@ String getFlightQuotesURL(String originAirportCode,
     String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate/$returnDate";
+  return "${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate?inboundpartialdate=$returnDate";
 }
 
 /// returns a url to make the request from, according to the
@@ -63,7 +63,7 @@ String getFlightRoutesURL(
     String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate/$returnDate";
+  return "${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate?inboundpartialdate=$returnDate";
 }
 
 /// returns the url to make a request from, in order to get
@@ -83,7 +83,6 @@ Future<List<String>> getAirportCodes(String placeName) async {
   var url = getAirportsURL(placeName);
   final response = await http.get(url);
   if (response.statusCode == 200) {
-
     final List<Map<String, dynamic>> responseBody = json.decode(response.body);
 
     // in some requests the first entry is data about the city itselt
@@ -99,7 +98,6 @@ Future<List<String>> getAirportCodes(String placeName) async {
     }
 
     return codes;
-    
   } else {
     throw Exception("Failed to get airport data");
   }
@@ -113,9 +111,9 @@ String formattedDate(DateTime date) {
 /// returns data from response as json
 List<Map<String, String>> jsonFromResponse(dynamic response) {
   final dynamic responseBody = json.decode(response.body);
-  List<Map<String, String>> flightDataEntries = List<Map<String, dynamic>>();
+  List<Map<String, dynamic>> flightDataEntries = List<Map<String, dynamic>>();
   for (var quote in responseBody["Quotes"]) {
-    Map<String, String> flightDataEntry =
+    Map<String, dynamic> flightDataEntry =
         getFlightDataEntryFromQuote(quote, responseBody);
     flightDataEntries.add(flightDataEntry);
   }
@@ -126,34 +124,88 @@ List<Map<String, String>> jsonFromResponse(dynamic response) {
 /// returns a dictionary containing data ablot a flight.
 /// a dictionary is built from json api response and a flight quote
 /// in the response.
-Map<String, String> getFlightDataEntryFromQuote(var quote, dynamic responseBody) {
-  Map<String, String> flightDataEntry = Map<String, String>();
-  flightDataEntry["Flight Number"] = "";
-  flightDataEntry["Departure City"] =
-      getDepartureCityFromQuote(quote, responseBody);
-  flightDataEntry["Arrival City"] =
-      getArrivalCityFromQuote(quote, responseBody);
-  flightDataEntry["Departure Airport"] =
-      getDepartureAirportFromQuote(quote, responseBody);
-  flightDataEntry["Arrival Airport"] =
-      getArrivalAirportFromQuote(quote, responseBody);
-  flightDataEntry["Departure Time"] = quote["OutboudLeg"]["DepartureDate"];
-  flightDataEntry["Arrival Time"] = "";
-  flightDataEntry["Carrier"] = getCarrierNameFromQuote(quote, responseBody);
-  flightDataEntry["Price"] = quote["MinPrice"];
+Map<String, dynamic> getFlightDataEntryFromQuote(
+    var quote, dynamic responseBody) {
+  Map<String, dynamic> flightDataEntry = Map<String, dynamic>();
+  flightDataEntry["Price"] = quote["MinPrice"].toString();
+  flightDataEntry["One Way"] = false;
+  flightDataEntry["Origin"] =
+      getPrimaryFlightDataFromQuote(quote, responseBody);
+
+  if (quote.containsKey("InboundLeg")) {
+    flightDataEntry["Return"] =
+        getReturnFlightDataFromQuote(quote, responseBody);
+    flightDataEntry["One Way"] = true;
+  } else {
+    flightDataEntry["Return"] = null;
+  }
 
   return flightDataEntry;
 }
 
-/// returns the departure city of a partucular flight quote
-String getDepartureCityFromQuote(var quote, dynamic responseBody) {
+Map<String, String> getPrimaryFlightDataFromQuote(
+    var quote, dynamic responseBody) {
+  Map<String, String> primaryFlightDataEntry = Map<String, String>();
+  primaryFlightDataEntry["Flight Number"] = "";
+  primaryFlightDataEntry["Departure City"] =
+      getPrimaryDepartureCityFromQuote(quote, responseBody);
+  primaryFlightDataEntry["Arrival City"] =
+      getPrimaryArrivalCityFromQuote(quote, responseBody);
+  primaryFlightDataEntry["Departure Airport"] =
+      getPrimaryDepartureAirportFromQuote(quote, responseBody);
+  primaryFlightDataEntry["Arrival Airport"] =
+      getPrimaryArrivalAirportFromQuote(quote, responseBody);
+  primaryFlightDataEntry["Departure Time"] =
+      quote["OutboundLeg"]["DepartureDate"];
+  primaryFlightDataEntry["Arrival Time"] = "";
+  primaryFlightDataEntry["Carrier"] =
+      getPrimaryFlightCarrierNameFromQuote(quote, responseBody);
+
+  return primaryFlightDataEntry;
+}
+
+Map<String, String> getReturnFlightDataFromQuote(
+    var quote, dynamic responseBody) {
+  Map<String, String> returnFlightDataEntry = Map<String, String>();
+  returnFlightDataEntry["Flight Number"] = "";
+  returnFlightDataEntry["Departure City"] =
+      getReturnDepartureCityFromQuote(quote, responseBody);
+  returnFlightDataEntry["Arrival City"] =
+      getReturnArrivalCityFromQuote(quote, responseBody);
+  returnFlightDataEntry["Departure Airport"] =
+      getReturnDepartureAirportFromQuote(quote, responseBody);
+  returnFlightDataEntry["Arrival Airport"] =
+      getReturnArrivalAirportFromQuote(quote, responseBody);
+  returnFlightDataEntry["Departure Time"] =
+      quote["InboundLeg"]["DepartureDate"];
+  returnFlightDataEntry["Arrival Time"] = "";
+  returnFlightDataEntry["Carrier"] =
+      getPrimaryFlightCarrierNameFromQuote(quote, responseBody);
+
+  return returnFlightDataEntry;
+}
+
+/// returns the departure city of the primary flight of a partucular flight quote
+String getPrimaryDepartureCityFromQuote(var quote, dynamic responseBody) {
   var cityId = quote["OutboundLeg"]["OriginId"];
   return getCityNameFromCityId(cityId, responseBody);
 }
 
-/// returns the arrival city of a particular flight quote
-String getArrivalCityFromQuote(var quote, dynamic responseBody) {
+/// returns the arrival city of the primary flight of a particular flight quote
+String getPrimaryArrivalCityFromQuote(var quote, dynamic responseBody) {
   var cityId = quote["OutboundLeg"]["DestinationId"];
+  return getCityNameFromCityId(cityId, responseBody);
+}
+
+/// returns the departure city of the return flight of a partucular flight quote
+String getReturnDepartureCityFromQuote(var quote, dynamic responseBody) {
+  var cityId = quote["InboundLeg"]["OriginId"];
+  return getCityNameFromCityId(cityId, responseBody);
+}
+
+/// returns the arrival city of the return flight of a particular flight quote
+String getReturnArrivalCityFromQuote(var quote, dynamic responseBody) {
+  var cityId = quote["InboundLeg"]["DestinationId"];
   return getCityNameFromCityId(cityId, responseBody);
 }
 
@@ -170,14 +222,26 @@ String getCityNameFromCityId(var cityId, dynamic responseBody) {
 }
 
 /// returns the departure airport from a flight quote
-String getDepartureAirportFromQuote(var quote, dynamic responseBody) {
+String getPrimaryDepartureAirportFromQuote(var quote, dynamic responseBody) {
   var cityId = quote["OutboundLeg"]["OriginId"];
   return getAirportCodeFromCityId(cityId, responseBody);
 }
 
 /// returns the arrival airport from a flight quote
-String getArrivalAirportFromQuote(var quote, dynamic responseBody) {
+String getPrimaryArrivalAirportFromQuote(var quote, dynamic responseBody) {
   var cityId = quote["OutboundLeg"]["DestinationId"];
+  return getAirportCodeFromCityId(cityId, responseBody);
+}
+
+/// returns the departure airport from a flight quote
+String getReturnDepartureAirportFromQuote(var quote, dynamic responseBody) {
+  var cityId = quote["InboundLeg"]["OriginId"];
+  return getAirportCodeFromCityId(cityId, responseBody);
+}
+
+/// returns the arrival airport from a flight quote
+String getReturnArrivalAirportFromQuote(var quote, dynamic responseBody) {
+  var cityId = quote["InboundLeg"]["DestinationId"];
   return getAirportCodeFromCityId(cityId, responseBody);
 }
 
@@ -193,11 +257,28 @@ String getAirportCodeFromCityId(var cityId, dynamic responseBody) {
   return "";
 }
 
-/// returns a name of a carrier from a flight quote.
+/// returns a name of a carrier of the primary flight from  flight quote.
 /// if a flights has multiple carriers, returns a string with
 /// all carriers, space separated
-String getCarrierNameFromQuote(var quote, dynamic responseBody) {
+String getPrimaryFlightCarrierNameFromQuote(var quote, dynamic responseBody) {
   Set<int> carrierIds = Set<int>.from(quote["OutboundLeg"]["CarrierIds"]);
+  String carrierIdsStr = "";
+
+  for (var carrier in responseBody["Carriers"]) {
+    if (carrierIds.contains(carrier["CarrierId"])) {
+      carrierIdsStr = carrierIdsStr + " " + carrier["CarrierId"].toString();
+    }
+  }
+
+  return carrierIdsStr;
+}
+
+
+/// returns a name of a carrier of the return flight from flight quote.
+/// if a flights has multiple carriers, returns a string with
+/// all carriers, space separated
+String getPReturnFlightCarrierNameFromQuote(var quote, dynamic responseBody) {
+  Set<int> carrierIds = Set<int>.from(quote["InboundLeg"]["CarrierIds"]);
   String carrierIdsStr = "";
 
   for (var carrier in responseBody["Carriers"]) {
