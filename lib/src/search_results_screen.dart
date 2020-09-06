@@ -7,40 +7,46 @@ import 'package:Air9/src/flight_search.dart' show FlightSearchQuery;
 
 /// a class representing a single search result ofr a particular flight
 class FlightSearchResult {
-  Flight flight;
+  Flight primaryFlight;
+  Flight returnFlight;
   String price;
+  bool isOneWay;
 
   /// a constructor for the class. The constructor recieves
   /// the various paraments related to the details of the flight
   /// e.g origin, destination, date, price, etc.
   FlightSearchResult(
-      String flightNumber,
-      String departureCity,
-      String arrivalCity,
-      String departureAirport,
-      String arrivalAirport,
-      DateTime departureAt,
-      DateTime arrivalAt,
-      String carrier,
-      String price) {
-    this.flight = Flight(flightNumber, departureCity, arrivalCity,
-        departureAirport, arrivalAirport, departureAt, arrivalAt, carrier);
-    this.price = price;
-  }
+      this.primaryFlight, this.returnFlight, this.price, this.isOneWay);
 
   /// factory constructor that builds the object based on the data
   /// passed as a JSON
   factory FlightSearchResult.fromJSON(Map<String, dynamic> json) {
+    Flight originFlight = Flight(
+        json["Origin"]["Flight Number"],
+        json["Origin"]['Departure City'],
+        json["Origin"]["Arrival City"],
+        json["Origin"]["Departure Airport"],
+        json["Origin"]["Arrival Airport"],
+        DateTime.parse(json["Origin"]["Departure Time"]),
+        DateTime.parse(json["Origin"]["Arrival Time"]),
+        json["Origin"]["Carrier"]);
+    Flight returnFlight;
+    if (json["One Way"]) {
+      returnFlight = null;
+    } else {
+      returnFlight = Flight(
+          json["Return"]["Flight Number"],
+          json["Return"]['Departure City'],
+          json["Return"]["Arrival City"],
+          json["Return"]["Departure Airport"],
+          json["Return"]["Arrival Airport"],
+          DateTime.parse(json["Departure Time"]),
+          DateTime.parse(json["Arrival Time"]),
+          json["Carrier"]);
+    }
+
     return FlightSearchResult(
-        json["Flight Number"],
-        json['Departure City'],
-        json["Arrival City"],
-        json["Departure Airport"],
-        json["Arrival Airport"],
-        DateTime.parse(json["Departure Time"]),
-        DateTime.parse(json["Arrival Time"]),
-        json["Carrier"],
-        json["Price"]);
+        originFlight, returnFlight, json["Price"], json["One Way"]);
   }
 }
 
@@ -100,7 +106,10 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   FlightSearchResult get model => this.widget.model;
 
   /// return the data about the flight as a [Flight]
-  Flight get flight => this.model.flight;
+  Flight get primaryFlight => this.model.primaryFlight;
+  Flight get returnFlight => this.model.returnFlight;
+  bool get isOneWay => this.model.isOneWay;
+  String get price => this.model.price;
 }
 
 /// a widget class representing the the visual representation
