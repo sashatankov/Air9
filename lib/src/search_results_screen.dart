@@ -98,7 +98,104 @@ class FlightSearchResultWidget extends StatefulWidget {
 class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   @override
   Widget build(BuildContext context) {
-    return Card();
+    return Card(
+      child: this.getFlightCard()
+    );
+  }
+
+  Widget getFlightCard() {
+    if(this.isOneWay) {
+      return this.getOneWayFlightCard();
+    } else {
+      return this.getRoundTripFlightCard();
+    }
+  }
+
+  Widget getOneWayFlightCard() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 4,
+          child: this.getPrimaryFlightRow(),
+        ),
+        VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: Text(this.price)
+          ),
+        ),
+        
+      ],
+    );
+  }
+
+  Widget getRoundTripFlightCard() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 4,
+          child: Column(
+            children: <Widget>[
+              this.getPrimaryFlightRow(),
+              Divider(),
+              this.getReturnFlightRow(),
+            ],
+          ),
+        ),
+        VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: Text(this.price)
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getPrimaryFlightRow() {
+    return Row(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Text(this.primaryFlight.departureAirport),
+            Text(this.primaryFlight.detartureDate),
+            Text(this.primaryFlight.departureTime),
+          ],
+        ),
+        Icon(Icons.arrow_forward),
+        Column(
+          children: <Widget>[
+            Text(this.primaryFlight.arrivalAirport),
+            Text(this.primaryFlight.arrivalDate),
+            Text(this.primaryFlight.arrivalTime)
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getReturnFlightRow() {
+    return Row(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Text(this.returnFlight.departureAirport),
+            Text(this.returnFlight.detartureDate),
+            Text(this.returnFlight.departureTime),
+          ],
+        ),
+        Icon(Icons.arrow_forward),
+        Column(
+          children: <Widget>[
+            Text(this.returnFlight.arrivalAirport),
+            Text(this.returnFlight.arrivalDate),
+            Text(this.returnFlight.arrivalTime)
+          ],
+        ),
+      ],
+    );
   }
 
   /// returns the data about the search result as a [FlightSearchResult] a.k.a
