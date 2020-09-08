@@ -127,7 +127,8 @@ List<Map<String, String>> jsonFromResponse(dynamic response) {
 Map<String, dynamic> getFlightDataEntryFromQuote(
     var quote, dynamic responseBody) {
   Map<String, dynamic> flightDataEntry = Map<String, dynamic>();
-  flightDataEntry["Price"] = quote["MinPrice"].toString();
+  String currencySymbol = responseBody["Currencies"][0]["Symbol"];
+  flightDataEntry["Price"] = currencySymbol + quote["MinPrice"].toString();
   flightDataEntry["One Way"] = false;
   flightDataEntry["Origin"] =
       getPrimaryFlightDataFromQuote(quote, responseBody);
@@ -272,7 +273,6 @@ String getPrimaryFlightCarrierNameFromQuote(var quote, dynamic responseBody) {
 
   return carrierIdsStr;
 }
-
 
 /// returns a name of a carrier of the return flight from flight quote.
 /// if a flights has multiple carriers, returns a string with
