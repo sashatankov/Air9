@@ -25,20 +25,23 @@ const Map<String, String> apiKeys = {
 Future<FlightSearchResults> fetchFlights(FlightSearchQuery query) async {
   List<String> originAirportCodes = await getAirportCodes(query.from);
   List<String> destinationAirportCodes = await getAirportCodes(query.to);
-  List<String> urls;
+  List<String> urls = List<String>();
   for (String originCode in originAirportCodes) {
     for (String destinationCode in destinationAirportCodes) {
       urls.add(getFlightRoutesURL(
           originCode, destinationCode, formattedDate(query.departureDate)));
     }
   }
-  List<Map<String, dynamic>> data = List<Map<String, dynamic>>();
+  List<dynamic> data = List<dynamic>();
   for (String url in urls) {
-    final dynamic response = await http.get(url);
-    List<Map<String, dynamic>> flightEntries = jsonFromResponse(response);
+    final dynamic response = await http.get(url, headers: {
+      "x-rapidapi-host": rapidApiHosts[skyScannerStr],
+      "x-rapidapi-key": apiKeys[rapidStr],
+    });
+    List<dynamic> flightEntries = jsonFromResponse(response);
     data.addAll(flightEntries);
   }
-
+  print("returning all flights...");
   return FlightSearchResults.fromJSON(data);
 }
 
@@ -51,7 +54,7 @@ String getFlightQuotesURL(String originAirportCode,
     String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate?inboundpartialdate=$returnDate";
+  return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate?inboundpartialdate=$returnDate";
 }
 
 /// returns a url to make the request from, according to the
@@ -63,7 +66,7 @@ String getFlightRoutesURL(
     String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate?inboundpartialdate=$returnDate";
+  return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate?inboundpartialdate=$returnDate";
 }
 
 /// returns the url to make a request from, in order to get
@@ -72,23 +75,31 @@ String getAirportsURL(String placeName,
     {String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "${rapidApiHosts[tripAdvisorStr]}/airports/search/?locale=$resultsLanguage&query=$placeName";
+  return "https://${rapidApiHosts[tripAdvisorStr]}/airports/search/?locale=$resultsLanguage&query=$placeName";
 }
 
 /// makes an api request to retreive the airport codes according
 /// to the name of the city
 Future<List<String>> getAirportCodes(String placeName) async {
   List<String> codes = List<String>();
-  List<Map<String, dynamic>> airports;
+  List<dynamic> airports;
   var url = getAirportsURL(placeName);
-  final response = await http.get(url);
+  final response = await http.get(url, headers: {
+    "x-rapidapi-host": rapidApiHosts[tripAdvisorStr],
+    "x-rapidapi-key": apiKeys[rapidStr],
+  });
   if (response.statusCode == 200) {
-    final List<Map<String, dynamic>> responseBody = json.decode(response.body);
+    final List<dynamic> responseBody = json.decode(response.body);
 
     // in some requests the first entry is data about the city itselt
     // if so, remove it from the response body.
-    if (responseBody[0].containsKey("display_sub_title")) {
-      airports = responseBody.sublist(1);
+    Map<String, dynamic> firstElement = responseBody[0];
+    if (firstElement.containsKey("display_sub_title")) {
+      if (firstElement["display_sub_title"].startsWith("All")) {
+        airports = responseBody.sublist(1);
+      } else {
+        airports = responseBody;
+      }
     } else {
       airports = responseBody;
     }
@@ -109,13 +120,16 @@ String formattedDate(DateTime date) {
 }
 
 /// returns data from response as json
-List<Map<String, String>> jsonFromResponse(dynamic response) {
+List<Map<String, dynamic>> jsonFromResponse(dynamic response) {
   final dynamic responseBody = json.decode(response.body);
   List<Map<String, dynamic>> flightDataEntries = List<Map<String, dynamic>>();
-  for (var quote in responseBody["Quotes"]) {
-    Map<String, dynamic> flightDataEntry =
-        getFlightDataEntryFromQuote(quote, responseBody);
-    flightDataEntries.add(flightDataEntry);
+
+  if (responseBody != null && responseBody["Quotes"] != null) {
+    for (var quote in responseBody["Quotes"]) {
+      Map<String, dynamic> flightDataEntry =
+          getFlightDataEntryFromQuote(quote, responseBody);
+      flightDataEntries.add(flightDataEntry);
+    }
   }
 
   return flightDataEntries;
@@ -128,15 +142,16 @@ Map<String, dynamic> getFlightDataEntryFromQuote(
     var quote, dynamic responseBody) {
   Map<String, dynamic> flightDataEntry = Map<String, dynamic>();
   String currencySymbol = responseBody["Currencies"][0]["Symbol"];
-  flightDataEntry["Price"] = currencySymbol + quote["MinPrice"].toString();
-  flightDataEntry["One Way"] = false;
+  flightDataEntry["Price"] = currencySymbol + double.parse(quote["MinPrice"]).floor().toString();
+
+  flightDataEntry["One Way"] = true;
   flightDataEntry["Origin"] =
       getPrimaryFlightDataFromQuote(quote, responseBody);
 
   if (quote.containsKey("InboundLeg")) {
     flightDataEntry["Return"] =
         getReturnFlightDataFromQuote(quote, responseBody);
-    flightDataEntry["One Way"] = true;
+    flightDataEntry["One Way"] = false;
   } else {
     flightDataEntry["Return"] = null;
   }
@@ -158,7 +173,7 @@ Map<String, String> getPrimaryFlightDataFromQuote(
       getPrimaryArrivalAirportFromQuote(quote, responseBody);
   primaryFlightDataEntry["Departure Time"] =
       quote["OutboundLeg"]["DepartureDate"];
-  primaryFlightDataEntry["Arrival Time"] = "";
+  primaryFlightDataEntry["Arrival Time"] = DateTime.now().toIso8601String();
   primaryFlightDataEntry["Carrier"] =
       getPrimaryFlightCarrierNameFromQuote(quote, responseBody);
 
@@ -179,7 +194,7 @@ Map<String, String> getReturnFlightDataFromQuote(
       getReturnArrivalAirportFromQuote(quote, responseBody);
   returnFlightDataEntry["Departure Time"] =
       quote["InboundLeg"]["DepartureDate"];
-  returnFlightDataEntry["Arrival Time"] = "";
+  returnFlightDataEntry["Arrival Time"] = DateTime.now().toIso8601String();
   returnFlightDataEntry["Carrier"] =
       getPrimaryFlightCarrierNameFromQuote(quote, responseBody);
 

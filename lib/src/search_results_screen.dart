@@ -48,6 +48,14 @@ class FlightSearchResult {
     return FlightSearchResult(
         originFlight, returnFlight, json["Price"], json["One Way"]);
   }
+
+  @override
+  String toString() {
+    return "From: " +
+        this.primaryFlight.departureCity +
+        " To: " +
+        this.primaryFlight.arrivalCity;
+  }
 }
 
 /// a class represents a collection of [FlightSearchResult] objects
@@ -68,7 +76,7 @@ class FlightSearchResults {
 
   /// factory method that build a collection of [FlightSearchResult] objects
   /// from a JSON
-  factory FlightSearchResults.fromJSON(List<Map<String, dynamic>> json) {
+  factory FlightSearchResults.fromJSON(List<dynamic> json) {
     List<FlightSearchResult> results = List<FlightSearchResult>();
     for (var entry in json) {
       results.add(FlightSearchResult.fromJSON(entry));
@@ -79,6 +87,16 @@ class FlightSearchResults {
 
   /// return the size of the collection
   int get size => this.searchResults.length;
+
+  @override
+  String toString() {
+    String output = "";
+    for (FlightSearchResult result in this.searchResults) {
+      output += result.toString() + "\n";
+    }
+
+    return output;
+  }
 }
 
 /// a widget class the represents the visual representation of the
@@ -99,12 +117,16 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: this.getFlightCard()
+      margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
+      child: Container(
+        height: 150,
+        child: this.getFlightCard(),
+      ),
     );
   }
 
   Widget getFlightCard() {
-    if(this.isOneWay) {
+    if (this.isOneWay) {
       return this.getOneWayFlightCard();
     } else {
       return this.getRoundTripFlightCard();
@@ -115,17 +137,19 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     return Row(
       children: <Widget>[
         Expanded(
-          flex: 4,
+          flex: 3,
           child: this.getPrimaryFlightRow(),
         ),
         VerticalDivider(),
         Expanded(
           flex: 1,
           child: Center(
-            child: Text(this.price)
+            child: Text(
+              this.price,
+              style: this.getPriceStyle(),
+            ),
           ),
         ),
-        
       ],
     );
   }
@@ -147,7 +171,10 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
         Expanded(
           flex: 1,
           child: Center(
-            child: Text(this.price)
+            child: Text(
+              this.price,
+              style: this.getPriceStyle()
+            ),
           ),
         ),
       ],
@@ -155,46 +182,100 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   }
 
   Widget getPrimaryFlightRow() {
-    return Row(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Column(
+        Row(
           children: <Widget>[
-            Text(this.primaryFlight.departureAirport),
-            Text(this.primaryFlight.detartureDate),
-            Text(this.primaryFlight.departureTime),
+            Column(
+              children: <Widget>[
+                Text(
+                  this.primaryFlight.departureAirport,
+                  style: this.getAirportCodeStyle(),
+                ),
+              ],
+            ),
+            Icon(Icons.arrow_forward),
+            Column(
+              children: <Widget>[
+                Text(
+                  this.primaryFlight.arrivalAirport,
+                  style: this.getAirportCodeStyle(),
+                ),
+              ],
+            ),
           ],
         ),
-        Icon(Icons.arrow_forward),
-        Column(
-          children: <Widget>[
-            Text(this.primaryFlight.arrivalAirport),
-            Text(this.primaryFlight.arrivalDate),
-            Text(this.primaryFlight.arrivalTime)
-          ],
+        Text(
+          "${this.primaryFlight.detartureDate}  ${this.primaryFlight.departureTime}",
+          style: this.getDepartureTimeStyle(),
         ),
       ],
     );
   }
 
   Widget getReturnFlightRow() {
-    return Row(
+    return Column(
       children: <Widget>[
-        Column(
+        Row(
           children: <Widget>[
-            Text(this.returnFlight.departureAirport),
-            Text(this.returnFlight.detartureDate),
-            Text(this.returnFlight.departureTime),
+            Column(
+              children: <Widget>[
+                Text(
+                  this.returnFlight.departureAirport,
+                  style: this.getAirportCodeStyle(),
+                ),
+              ],
+            ),
+            Icon(Icons.arrow_forward),
+            Column(
+              children: <Widget>[
+                Text(
+                  this.returnFlight.arrivalAirport,
+                  style: this.getAirportCodeStyle(),
+                ),
+              ],
+            ),
           ],
         ),
-        Icon(Icons.arrow_forward),
-        Column(
-          children: <Widget>[
-            Text(this.returnFlight.arrivalAirport),
-            Text(this.returnFlight.arrivalDate),
-            Text(this.returnFlight.arrivalTime)
-          ],
+        Text(
+          "Departure On:",
+          style: this.getDepartureTimeLabelStyle(),
+        ),
+        Text(
+          "${this.primaryFlight.detartureDate}  ${this.primaryFlight.departureTime}",
+          style: this.getDepartureTimeStyle(),
         ),
       ],
+    );
+  }
+
+  TextStyle getAirportCodeStyle() {
+    return TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.w600,
+    );
+  }
+
+  TextStyle getDepartureTimeLabelStyle() {
+    return TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w400,
+    );
+  }
+
+  TextStyle getDepartureTimeStyle() {
+    return TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w200,
+    );
+  }
+
+  TextStyle getPriceStyle() {
+    return TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w500,
     );
   }
 
@@ -283,6 +364,8 @@ class _FlightSearchResultsScreenWidgetState
       future: this._futureSearchResultFlights,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          print("Recieved data: ");
+          print(snapshot.data.toString());
           return FlightSearchResultsWidget(snapshot.data);
         } else if (snapshot.hasError) {
           return Text("Sorry, Couldn't find any flights");
