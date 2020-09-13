@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:Air9/src/search_results_screen.dart';
 
 /// a class represents a search query in the search screen in the app
 class FlightSearchQuery {
@@ -79,8 +80,13 @@ class FlightSearchController {
   }
 
   /// analyzes the submitted search query;
-  void analyzeSearchQuery() {
-    // TODO
+  void analyzeSearchQuery(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FlightSearchResultsScreenWidget(model),
+      ),
+    );
   }
 }
 
@@ -268,7 +274,7 @@ class _FlightSearchFormWidgetState extends State<FlightSearchFormWidget> {
         padding: EdgeInsets.all(8),
         onPressed: () {
           this.widget.controller.printUserInput(); // this is a test to console
-          this.widget.controller.analyzeSearchQuery();
+          this.widget.controller.analyzeSearchQuery(context);
         },
         child: Text("Find Me Flights"),
       ),
