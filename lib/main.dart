@@ -5,15 +5,16 @@ import 'package:Air9/src/flight_data.dart';
 import 'package:Air9/src/flight_search.dart';
 import 'package:flutter/material.dart';
 import 'package:Air9/src/home_screen.dart';
+import 'package:Air9/src/search_results_screen.dart';
 
 void main() {
   Air9App app = Air9App();
   app.run();
+
 }
 
 /// the main class of the app
 class Air9App {
-
   /// initializes the app and runs the app
   void run() {
     var flights = randomFlights(10);
