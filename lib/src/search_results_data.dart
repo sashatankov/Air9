@@ -25,11 +25,17 @@ const Map<String, String> apiKeys = {
 Future<FlightSearchResults> fetchFlights(FlightSearchQuery query) async {
   List<String> originAirportCodes = await getAirportCodes(query.from);
   List<String> destinationAirportCodes = await getAirportCodes(query.to);
+  String departureDate = formattedDate(query.departureDate);
+  String returnDate = "";
+  if (!query.isOneWay) {
+    returnDate = formattedDate(query.arrivalDate);
+  }
+
   List<String> urls = List<String>();
   for (String originCode in originAirportCodes) {
     for (String destinationCode in destinationAirportCodes) {
       urls.add(getFlightRoutesURL(
-          originCode, destinationCode, formattedDate(query.departureDate)));
+          originCode, destinationCode, departureDate, returnDate: returnDate));
     }
   }
   List<dynamic> data = List<dynamic>();
@@ -54,7 +60,11 @@ String getFlightQuotesURL(String originAirportCode,
     String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate?inboundpartialdate=$returnDate";
+  
+  if(returnDate == "") {
+    return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate";
+  }
+  return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browsequotes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originAirportCode/$destinationAirportCode/$departureDate/$returnDate";
 }
 
 /// returns a url to make the request from, according to the
@@ -66,7 +76,11 @@ String getFlightRoutesURL(
     String userLocationCountry = "US",
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
-  return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate?inboundpartialdate=$returnDate";
+  if(returnDate == "") {
+    return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate";
+  }
+  return "https://${rapidApiHosts[skyScannerStr]}/apiservices/browseroutes/v1.0/$userLocationCountry/$resultsCurrency/$resultsLanguage/$originCode/$destinationCode/$departureDate/$returnDate";
+  
 }
 
 /// returns the url to make a request from, in order to get
@@ -142,7 +156,8 @@ Map<String, dynamic> getFlightDataEntryFromQuote(
     var quote, dynamic responseBody) {
   Map<String, dynamic> flightDataEntry = Map<String, dynamic>();
   String currencySymbol = responseBody["Currencies"][0]["Symbol"];
-  flightDataEntry["Price"] = currencySymbol + double.parse(quote["MinPrice"]).floor().toString();
+  flightDataEntry["Price"] =
+      currencySymbol + quote["MinPrice"].toInt().toString();
 
   flightDataEntry["One Way"] = true;
   flightDataEntry["Origin"] =
