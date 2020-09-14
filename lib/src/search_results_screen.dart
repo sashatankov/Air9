@@ -40,9 +40,9 @@ class FlightSearchResult {
           json["Return"]["Arrival City"],
           json["Return"]["Departure Airport"],
           json["Return"]["Arrival Airport"],
-          DateTime.parse(json["Departure Time"]),
-          DateTime.parse(json["Arrival Time"]),
-          json["Carrier"]);
+          DateTime.parse(json["Return"]["Departure Time"]),
+          DateTime.parse(json["Return"]["Arrival Time"]),
+          json["Return"]["Carrier"]);
     }
 
     return FlightSearchResult(
@@ -85,6 +85,10 @@ class FlightSearchResults {
     return FlightSearchResults.fromCollection(results);
   }
 
+  void sort(Comparator<FlightSearchResult> comparator) {
+    this.searchResults.sort(comparator);
+  }
+
   /// return the size of the collection
   int get size => this.searchResults.length;
 
@@ -116,12 +120,10 @@ class FlightSearchResultWidget extends StatefulWidget {
 class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
-      child: Container(
-        height: 150,
-        child: this.getFlightCard(),
-      ),
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+      height: this.getSearchResultBoxHeight(),
+      child: this.getFlightCard(),
     );
   }
 
@@ -160,6 +162,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
         Expanded(
           flex: 4,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               this.getPrimaryFlightRow(),
               Divider(),
@@ -171,10 +175,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
         Expanded(
           flex: 1,
           child: Center(
-            child: Text(
-              this.price,
-              style: this.getPriceStyle()
-            ),
+            child: Text(this.price, style: this.getPriceStyle()),
           ),
         ),
       ],
@@ -217,6 +218,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
 
   Widget getReturnFlightRow() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
           children: <Widget>[
@@ -240,11 +243,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
           ],
         ),
         Text(
-          "Departure On:",
-          style: this.getDepartureTimeLabelStyle(),
-        ),
-        Text(
-          "${this.primaryFlight.detartureDate}  ${this.primaryFlight.departureTime}",
+          "${this.returnFlight.detartureDate}  ${this.returnFlight.departureTime}",
           style: this.getDepartureTimeStyle(),
         ),
       ],
@@ -279,6 +278,10 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  double getSearchResultBoxHeight() {
+    return this.isOneWay ? 150 : 200;
+  }
+
   /// returns the data about the search result as a [FlightSearchResult] a.k.a
   /// the model og the widget
   FlightSearchResult get model => this.widget.model;
@@ -307,12 +310,41 @@ class FlightSearchResultsWidget extends StatefulWidget {
 
 /// a state class for the [FlightSearchResultsWidget]
 class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
+  List<FlightSearchResult> _results;
+  int _index;
+
+  @override
+  void initState() {
+    _index = -1;
+    _results = this.widget.model.searchResults;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    var res = this._results;
+    return ListView.separated(
       itemCount: this.model.size,
       itemBuilder: (context, index) {
-        return FlightSearchResultWidget(this.searchResults[index]);
+        print("Index: ${index}");
+        return Card(
+          margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: FlightSearchResultWidget(this.searchResults[index]),
+        );
+      },
+      separatorBuilder: (context, index1) {
+        print("Index: $index1");
+        return Card(
+          margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
+          color: Colors.lightBlue[100],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: FlightSearchResultWidget(this.searchResults[index1]),
+        );
       },
     );
   }
