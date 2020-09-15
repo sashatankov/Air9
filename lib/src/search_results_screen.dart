@@ -49,6 +49,7 @@ class FlightSearchResult {
         originFlight, returnFlight, json["Price"], json["One Way"]);
   }
 
+  /// return a string representation of a search result
   @override
   String toString() {
     return "From: " +
@@ -85,13 +86,15 @@ class FlightSearchResults {
     return FlightSearchResults.fromCollection(results);
   }
 
+  /// sort the search results
   void sort(Comparator<FlightSearchResult> comparator) {
     this.searchResults.sort(comparator);
   }
 
-  /// return the size of the collection
+  /// returns the size of the collection
   int get size => this.searchResults.length;
 
+  /// return a string representation of the search results
   @override
   String toString() {
     String output = "";
@@ -127,6 +130,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// return a flight card for a flight
   Widget getFlightCard() {
     if (this.isOneWay) {
       return this.getOneWayFlightCard();
@@ -135,6 +139,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     }
   }
 
+  /// returns a flight card for the one-way flight, containing the
+  /// primary flight.
   Widget getOneWayFlightCard() {
     return Row(
       children: <Widget>[
@@ -156,6 +162,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// return a flight card for a round-trip card, containing both
+  /// the primary flight and the return flight
   Widget getRoundTripFlightCard() {
     return Row(
       children: <Widget>[
@@ -182,6 +190,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// returns a [Row] of the primary flight in flight card
   Widget getPrimaryFlightRow() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -216,6 +225,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// returns a [Row] of the return flight in flight card
   Widget getReturnFlightRow() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -250,6 +260,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// returns the style for 'airport-code' for flight card
   TextStyle getAirportCodeStyle() {
     return TextStyle(
       fontSize: 30,
@@ -257,13 +268,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
-  TextStyle getDepartureTimeLabelStyle() {
-    return TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.w400,
-    );
-  }
-
+  /// returns the style for 'departure time' label
   TextStyle getDepartureTimeStyle() {
     return TextStyle(
       fontSize: 18,
@@ -271,6 +276,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// returns the style of the price label in flight card
   TextStyle getPriceStyle() {
     return TextStyle(
       fontSize: 20,
@@ -278,6 +284,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// returns the height of the flight card box
+  /// depending whether the flight is one-way or round trip
   double getSearchResultBoxHeight() {
     return this.isOneWay ? 150 : 200;
   }
@@ -288,8 +296,14 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
 
   /// return the data about the flight as a [Flight]
   Flight get primaryFlight => this.model.primaryFlight;
+
+  /// returns the return-flight of the search result
   Flight get returnFlight => this.model.returnFlight;
+
+  /// returns true if the search result is one-way flight
   bool get isOneWay => this.model.isOneWay;
+
+  /// returns the price of the flight
   String get price => this.model.price;
 }
 
@@ -322,11 +336,9 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var res = this._results;
     return ListView.separated(
       itemCount: this.model.size,
       itemBuilder: (context, index) {
-        print("Index: ${index}");
         return Card(
           margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
           shape: RoundedRectangleBorder(
@@ -336,7 +348,6 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
         );
       },
       separatorBuilder: (context, index1) {
-        print("Index: $index1");
         return Card(
           margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
           color: Colors.lightBlue[100],
