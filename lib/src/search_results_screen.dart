@@ -1,61 +1,47 @@
 import 'dart:async';
 
 import 'package:Air9/src/flight.dart';
+import 'package:Air9/src/trip.dart';
 import 'package:flutter/material.dart';
 import 'package:Air9/src/search_results_data.dart' show fetchFlights;
 import 'package:Air9/src/flight_search.dart' show FlightSearchQuery;
 
 /// a class representing a single search result ofr a particular flight
 class FlightSearchResult {
-  Flight primaryFlight;
-  Flight returnFlight;
+  FlightTrip primaryFlight;
+  FlightTrip returnFlight;
   String price;
+  String currency;
   bool isOneWay;
 
   /// a constructor for the class. The constructor recieves
   /// the various paraments related to the details of the flight
   /// e.g origin, destination, date, price, etc.
-  FlightSearchResult(
-      this.primaryFlight, this.returnFlight, this.price, this.isOneWay);
+  FlightSearchResult(this.primaryFlight, this.returnFlight, this.price,
+      this.currency, this.isOneWay);
 
   /// factory constructor that builds the object based on the data
   /// passed as a JSON
   factory FlightSearchResult.fromJSON(Map<String, dynamic> json) {
-    Flight originFlight = Flight(
-        json["Origin"]["Flight Number"],
-        json["Origin"]['Departure City'],
-        json["Origin"]["Arrival City"],
-        json["Origin"]["Departure Airport"],
-        json["Origin"]["Arrival Airport"],
-        DateTime.parse(json["Origin"]["Departure Time"]),
-        DateTime.parse(json["Origin"]["Arrival Time"]),
-        json["Origin"]["Carrier"]);
-    Flight returnFlight;
+    FlightTrip originFlight = FlightTrip.fromJSON(json["Origin"]);
+    FlightTrip returnFlight;
     if (json["One Way"]) {
       returnFlight = null;
     } else {
-      returnFlight = Flight(
-          json["Return"]["Flight Number"],
-          json["Return"]['Departure City'],
-          json["Return"]["Arrival City"],
-          json["Return"]["Departure Airport"],
-          json["Return"]["Arrival Airport"],
-          DateTime.parse(json["Return"]["Departure Time"]),
-          DateTime.parse(json["Return"]["Arrival Time"]),
-          json["Return"]["Carrier"]);
+      returnFlight = FlightTrip.fromJSON(json["Return"]);
     }
 
     return FlightSearchResult(
-        originFlight, returnFlight, json["Price"], json["One Way"]);
+        originFlight, returnFlight, json["Price"], json["Currency"], json["One Way"]);
   }
 
   /// return a string representation of a search result
   @override
   String toString() {
     return "From: " +
-        this.primaryFlight.departureCity +
+        this.primaryFlight.originCity +
         " To: " +
-        this.primaryFlight.arrivalCity;
+        this.primaryFlight.destinationCity;
   }
 }
 
@@ -201,7 +187,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
             Column(
               children: <Widget>[
                 Text(
-                  this.primaryFlight.departureAirport,
+                  this.primaryFlight.originAirport,
                   style: this.getAirportCodeStyle(),
                 ),
               ],
@@ -210,7 +196,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
             Column(
               children: <Widget>[
                 Text(
-                  this.primaryFlight.arrivalAirport,
+                  this.primaryFlight.destinationAirport,
                   style: this.getAirportCodeStyle(),
                 ),
               ],
@@ -218,7 +204,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
           ],
         ),
         Text(
-          "${this.primaryFlight.detartureDate}  ${this.primaryFlight.departureTime}",
+          "${this.primaryFlight.departureDate}  ${this.primaryFlight.departureTime}",
           style: this.getDepartureTimeStyle(),
         ),
       ],
@@ -236,7 +222,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
             Column(
               children: <Widget>[
                 Text(
-                  this.returnFlight.departureAirport,
+                  this.returnFlight.originAirport,
                   style: this.getAirportCodeStyle(),
                 ),
               ],
@@ -245,7 +231,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
             Column(
               children: <Widget>[
                 Text(
-                  this.returnFlight.arrivalAirport,
+                  this.returnFlight.destinationAirport,
                   style: this.getAirportCodeStyle(),
                 ),
               ],
@@ -253,7 +239,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
           ],
         ),
         Text(
-          "${this.returnFlight.detartureDate}  ${this.returnFlight.departureTime}",
+          "${this.returnFlight.departureDate}  ${this.returnFlight.departureTime}",
           style: this.getDepartureTimeStyle(),
         ),
       ],
@@ -295,10 +281,10 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   FlightSearchResult get model => this.widget.model;
 
   /// return the data about the flight as a [Flight]
-  Flight get primaryFlight => this.model.primaryFlight;
+  FlightTrip get primaryFlight => this.model.primaryFlight;
 
   /// returns the return-flight of the search result
-  Flight get returnFlight => this.model.returnFlight;
+  FlightTrip get returnFlight => this.model.returnFlight;
 
   /// returns true if the search result is one-way flight
   bool get isOneWay => this.model.isOneWay;
