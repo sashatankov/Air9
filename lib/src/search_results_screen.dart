@@ -204,9 +204,10 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
           ],
         ),
         Text(
-          "${this.primaryFlight.departureDate}  ${this.primaryFlight.departureTime}",
+          "${this.primaryFlight.departureDate}",
           style: this.getDepartureTimeStyle(),
         ),
+        this.getPrimaryFlightConnectionsRow(),
       ],
     );
   }
@@ -239,9 +240,10 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
           ],
         ),
         Text(
-          "${this.returnFlight.departureDate}  ${this.returnFlight.departureTime}",
+          "${this.returnFlight.departureDate}",
           style: this.getDepartureTimeStyle(),
         ),
+        this.getReturnFlightConnectionsRow(),
       ],
     );
   }
@@ -267,6 +269,40 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     return TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.w500,
+    );
+  }
+
+  
+  Widget getPrimaryFlightConnectionsRow() {
+    String connectionsStr = "";
+    if(this.model.primaryFlight.connections >= 1) {
+      connectionsStr = "connections";
+    } else if(this.model.primaryFlight.connections == 1) {
+      connectionsStr = "connection";
+    }
+
+    return Row(
+      children: <Widget>[
+        Text("${this.model.primaryFlight.connections}", style: TextStyle(fontWeight: FontWeight.w600)),
+        Text(" $connectionsStr"),
+      ]
+    );
+  }
+
+
+  Widget getReturnFlightConnectionsRow() {
+    String connectionsStr = "";
+    if(this.model.returnFlight.connections >= 1) {
+      connectionsStr = "connections";
+    } else if(this.model.returnFlight.connections == 1) {
+      connectionsStr = "connection";
+    }
+
+    return Row(
+      children: <Widget>[
+        Text("${this.model.returnFlight.connections}", style: TextStyle(fontWeight: FontWeight.w600)),
+        Text(" $connectionsStr"),
+      ]
     );
   }
 
