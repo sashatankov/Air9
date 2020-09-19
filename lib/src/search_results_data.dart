@@ -84,11 +84,11 @@ String getFlightOffersURL(
     {String returnDate = "",
     String currencyCode = "USD",
     int adultPassengers = 1,
-    bool nonStop}) {
+    bool nonStop = false}) {
   if (returnDate == "") {
-    return "https://${apiHosts[amadeusStr]}/v2/shopping/flihgt-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&currencyCode=$currencyCode&max=25&nonStop=$nonStop";
+    return "https://${apiHosts[amadeusStr]}/v2/shopping/flight-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&currencyCode=$currencyCode&max=25&nonStop=$nonStop";
   }
-  return "https://${apiHosts[amadeusStr]}/v2/shopping/flihgt-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&returnDate=$returnDate&currencyCode=$currencyCode&max=25&nonStop=$nonStop";
+  return "https://${apiHosts[amadeusStr]}/v2/shopping/flight-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&returnDate=$returnDate&currencyCode=$currencyCode&max=25&nonStop=$nonStop";
 }
 
 /// returns the url to make a request from, in order to get
@@ -177,7 +177,7 @@ Map<String, dynamic> getFlightDataEntryFromQuote(
 
 List<Map<String, String>> getFlightsDataFromItinerary(
     dynamic itinerary, dynamic responseBody) {
-  List<Map<String, String>> flightsData = List<Map<String, dynamic>>();
+  List<Map<String, String>> flightsData = List<Map<String, String>>();
   for (var flight in itinerary["segments"]) {
     flightsData.add(getPrimaryFlightDataFromItinerary(flight, responseBody));
   }
