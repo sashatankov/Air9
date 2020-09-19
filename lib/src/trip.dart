@@ -23,11 +23,13 @@ class FlightTrip {
           flightAsJson["Arrival City"],
           flightAsJson["Departure City"],
           flightAsJson["Arrival Airport"],
-          flightAsJson["Departure Time"],
-          flightAsJson["Arrival Time"],
+          DateTime.parse(flightAsJson["Departure Time"]),
+          DateTime.parse(flightAsJson["Arrival Time"]),
           flightAsJson["Carrier"]);
       flights.add(flight);
     }
+
+    return FlightTrip(flights);
   }
 
   /// returns the city where the trip begins, i.e the first flight departs
@@ -48,10 +50,9 @@ class FlightTrip {
 
   String get arrivalDate => this.flights.last.arrivalDate;
 
-  /// returns a list of flights that are connction flights in the trip
+  /// returns a list of flights that are connection flights in the trip
   /// i.e all the flights besides the first and last
-  List<Flight> get connections =>
-      this.flights.sublist(1, this.flights.length - 1);
+  int get connections => this.flights.length - 1;
 }
 
 /// a controller class for the [FlightTrip] class
