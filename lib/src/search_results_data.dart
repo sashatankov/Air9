@@ -60,11 +60,12 @@ Future<FlightSearchResults> fetchFlights(FlightSearchQuery query) async {
     }
   }
   List<dynamic> data = List<dynamic>();
+  List<dynamic> flightEntries;
   String authorizationKey = await getAuthorizationKey();
   for (String url in urls) {
     final dynamic response = await http
         .get(url, headers: {"Authorization": "Bearer $authorizationKey"});
-    List<dynamic> flightEntries = jsonFromResponse(response);
+    flightEntries = jsonFromResponse(response);
     data.addAll(flightEntries);
   }
 
@@ -141,10 +142,10 @@ List<Map<String, dynamic>> jsonFromResponse(dynamic response) {
   final dynamic responseBody = json.decode(response.body);
   List<Map<String, dynamic>> flightDataEntries = List<Map<String, dynamic>>();
 
+  Map<String, dynamic> flightDataEntry;
   if (responseBody != null && responseBody["data"] != null) {
     for (var quote in responseBody["data"]) {
-      Map<String, dynamic> flightDataEntry =
-          getFlightDataEntryFromQuote(quote, responseBody);
+      flightDataEntry = getFlightDataEntryFromQuote(quote, responseBody);
       flightDataEntries.add(flightDataEntry);
     }
   }
@@ -164,7 +165,7 @@ Map<String, dynamic> getFlightDataEntryFromQuote(
   flightDataEntry["Origin"] =
       getFlightsDataFromItinerary(quote["itineraries"][0], responseBody);
 
-  if (quote["itineraries"] == 2) {
+  if (quote["itineraries"].length == 2) {
     flightDataEntry["Return"] =
         getFlightsDataFromItinerary(quote["itineraries"][1], responseBody);
     flightDataEntry["One Way"] = false;
@@ -194,8 +195,8 @@ Map<String, String> getPrimaryFlightDataFromItinerary(
       getDepartureCityFromQuote(itinerary, responseBody);
   flightDataEntry["Arrival City"] =
       getArrivalCityFromQuote(itinerary, responseBody);
-  flightDataEntry["Departure Airport"] = itinerary["iataCode"];
-  flightDataEntry["Arrival Airport"] = itinerary["iataCode"];
+  flightDataEntry["Departure Airport"] = itinerary["departure"]["iataCode"];
+  flightDataEntry["Arrival Airport"] = itinerary["arrival"]["iataCode"];
   flightDataEntry["Departure Time"] = itinerary["departure"]["at"];
   flightDataEntry["Arrival Time"] = itinerary["arrival"]["at"];
   flightDataEntry["Carrier"] =
