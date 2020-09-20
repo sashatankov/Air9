@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:Air9/src/flight.dart';
 import 'package:Air9/src/trip.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:Air9/src/search_results_data.dart' show fetchFlights;
 import 'package:Air9/src/flight_search.dart' show FlightSearchQuery;
 
@@ -31,8 +32,8 @@ class FlightSearchResult {
       returnFlight = FlightTrip.fromJSON(json["Return"]);
     }
 
-    return FlightSearchResult(
-        originFlight, returnFlight, json["Price"], json["Currency"], json["One Way"]);
+    return FlightSearchResult(originFlight, returnFlight, json["Price"],
+        json["Currency"], json["One Way"]);
   }
 
   /// return a string representation of a search result
@@ -169,11 +170,18 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
         Expanded(
           flex: 1,
           child: Center(
-            child: Text(this.price, style: this.getPriceStyle()),
+            child: this.getPrice(),
           ),
         ),
       ],
     );
+  }
+
+  Widget getPrice() {
+    String text = double.parse(this.price).floor().toInt().toString();
+    Locale loc = Locale("en", 'US');
+    NumberFormat format = NumberFormat.simpleCurrency(locale: loc.toString());
+    return Text("${format.currencySymbol}$text", style: this.getPriceStyle());
   }
 
   /// returns a [Row] of the primary flight in flight card
@@ -272,44 +280,44 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
-  
   Widget getPrimaryFlightConnectionsRow() {
     String connectionsStr = "";
-    if(this.model.primaryFlight.connections >= 1) {
+    String numConnectionStr = "";
+    if (this.model.primaryFlight.connections > 1) {
       connectionsStr = "connections";
-    } else if(this.model.primaryFlight.connections == 1) {
+      numConnectionStr = this.model.primaryFlight.connections.toString();
+    } else if (this.model.primaryFlight.connections == 1) {
       connectionsStr = "connection";
+      numConnectionStr = this.model.primaryFlight.connections.toString();
     }
 
-    return Row(
-      children: <Widget>[
-        Text("${this.model.primaryFlight.connections}", style: TextStyle(fontWeight: FontWeight.w600)),
-        Text(" $connectionsStr"),
-      ]
-    );
+    return Row(children: <Widget>[
+      Text("$numConnectionStr", style: TextStyle(fontWeight: FontWeight.w600)),
+      Text(" $connectionsStr"),
+    ]);
   }
-
 
   Widget getReturnFlightConnectionsRow() {
     String connectionsStr = "";
-    if(this.model.returnFlight.connections >= 1) {
+    String numConnectionStr = "";
+    if (this.model.returnFlight.connections > 1) {
       connectionsStr = "connections";
-    } else if(this.model.returnFlight.connections == 1) {
+      numConnectionStr = this.model.returnFlight.connections.toString();
+    } else if (this.model.returnFlight.connections == 1) {
       connectionsStr = "connection";
+      numConnectionStr = this.model.returnFlight.connections.toString();
     }
 
-    return Row(
-      children: <Widget>[
-        Text("${this.model.returnFlight.connections}", style: TextStyle(fontWeight: FontWeight.w600)),
-        Text(" $connectionsStr"),
-      ]
-    );
+    return Row(children: <Widget>[
+      Text("$numConnectionStr", style: TextStyle(fontWeight: FontWeight.w600)),
+      Text(" $connectionsStr"),
+    ]);
   }
 
   /// returns the height of the flight card box
   /// depending whether the flight is one-way or round trip
   double getSearchResultBoxHeight() {
-    return this.isOneWay ? 150 : 200;
+    return this.isOneWay ? 200 : 250;
   }
 
   /// returns the data about the search result as a [FlightSearchResult] a.k.a
@@ -358,10 +366,13 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    print(this.model.toString());
+    return ListView.builder(
       itemCount: this.model.size,
       itemBuilder: (context, index) {
+        print("Index: $index");
         return Card(
+          elevation: 15.0,
           margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
@@ -369,16 +380,17 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
           child: FlightSearchResultWidget(this.searchResults[index]),
         );
       },
-      separatorBuilder: (context, index1) {
-        return Card(
-          margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
-          color: Colors.lightBlue[100],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: FlightSearchResultWidget(this.searchResults[index1]),
-        );
-      },
+      // separatorBuilder: (context, index) {
+      //   print("Index $index");
+      //   return Card(
+      //     margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
+      //     color: Colors.lightBlue[100],
+      //     shape: RoundedRectangleBorder(
+      //       borderRadius: BorderRadius.circular(10.0),
+      //     ),
+      //     child: FlightSearchResultWidget(this.searchResults[index]),
+      //   );
+      // },
     );
   }
 
