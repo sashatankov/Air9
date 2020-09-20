@@ -21,7 +21,7 @@ class FlightTrip {
           flightAsJson["Flight Number"],
           flightAsJson["Departure City"],
           flightAsJson["Arrival City"],
-          flightAsJson["Departure City"],
+          flightAsJson["Departure Airport"],
           flightAsJson["Arrival Airport"],
           DateTime.parse(flightAsJson["Departure Time"]),
           DateTime.parse(flightAsJson["Arrival Time"]),
