@@ -139,10 +139,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
         Expanded(
           flex: 1,
           child: Center(
-            child: Text(
-              this.price,
-              style: this.getPriceStyle(),
-            ),
+            child: this.getPrice(),
           ),
         ),
       ],
@@ -191,12 +188,17 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Column(
               children: <Widget>[
                 Text(
+                  this.primaryFlight.departureTime,
+                  style: this.getDepartureTimeStyle(),
+                ),
+                Text(
                   this.primaryFlight.originAirport,
-                  style: this.getAirportCodeStyle(),
+                  style: this.getAirportCodeStyle()
                 ),
               ],
             ),
@@ -204,16 +206,16 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
             Column(
               children: <Widget>[
                 Text(
+                  this.primaryFlight.arrivalTime,
+                  style: this.getDepartureTimeStyle(),
+                ),
+                Text(
                   this.primaryFlight.destinationAirport,
                   style: this.getAirportCodeStyle(),
                 ),
               ],
             ),
           ],
-        ),
-        Text(
-          "${this.primaryFlight.departureDate}",
-          style: this.getDepartureTimeStyle(),
         ),
         this.getPrimaryFlightConnectionsRow(),
       ],
@@ -227,18 +229,27 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Column(
               children: <Widget>[
                 Text(
+                  this.returnFlight.departureTime,
+                  style: this.getDepartureTimeStyle(),
+                ),
+                Text(
                   this.returnFlight.originAirport,
-                  style: this.getAirportCodeStyle(),
+                  style: this.getAirportCodeStyle()
                 ),
               ],
             ),
             Icon(Icons.arrow_forward),
             Column(
               children: <Widget>[
+                Text(
+                  this.returnFlight.arrivalTime,
+                  style: this.getDepartureTimeStyle(),
+                ),
                 Text(
                   this.returnFlight.destinationAirport,
                   style: this.getAirportCodeStyle(),
@@ -247,11 +258,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
             ),
           ],
         ),
-        Text(
-          "${this.returnFlight.departureDate}",
-          style: this.getDepartureTimeStyle(),
-        ),
-        this.getReturnFlightConnectionsRow(),
+        this.getPrimaryFlightConnectionsRow(),
       ],
     );
   }
@@ -259,16 +266,16 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   /// returns the style for 'airport-code' for flight card
   TextStyle getAirportCodeStyle() {
     return TextStyle(
-      fontSize: 30,
-      fontWeight: FontWeight.w600,
+      fontSize: 18,
+      fontWeight: FontWeight.w300,
     );
   }
 
   /// returns the style for 'departure time' label
   TextStyle getDepartureTimeStyle() {
     return TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.w200,
+      fontSize: 30,
+      fontWeight: FontWeight.w600,
     );
   }
 
@@ -317,7 +324,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
   /// returns the height of the flight card box
   /// depending whether the flight is one-way or round trip
   double getSearchResultBoxHeight() {
-    return this.isOneWay ? 200 : 250;
+    return this.isOneWay ? 150 : 250;
   }
 
   /// returns the data about the search result as a [FlightSearchResult] a.k.a
@@ -372,7 +379,8 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
       itemBuilder: (context, index) {
         print("Index: $index");
         return Card(
-          elevation: 15.0,
+          elevation: 8.0,
+          color: index % 2 == 0 ? Colors.white : Colors.lightBlue[100],
           margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
@@ -380,17 +388,6 @@ class _FlightSearchResultsWidgetState extends State<FlightSearchResultsWidget> {
           child: FlightSearchResultWidget(this.searchResults[index]),
         );
       },
-      // separatorBuilder: (context, index) {
-      //   print("Index $index");
-      //   return Card(
-      //     margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
-      //     color: Colors.lightBlue[100],
-      //     shape: RoundedRectangleBorder(
-      //       borderRadius: BorderRadius.circular(10.0),
-      //     ),
-      //     child: FlightSearchResultWidget(this.searchResults[index]),
-      //   );
-      // },
     );
   }
 
