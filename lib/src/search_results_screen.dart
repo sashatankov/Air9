@@ -174,6 +174,7 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// return a widget with the price of the flight
   Widget getPrice() {
     String text = double.parse(this.price).floor().toInt().toString();
     Locale loc = Locale("en", 'US');
@@ -287,6 +288,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
     );
   }
 
+  /// returns a widget displaying the number of connections of the primary flight
+  /// if there are no connections, nothing is displayed.
   Widget getPrimaryFlightConnectionsRow() {
     String connectionsStr = "";
     String numConnectionStr = "";
@@ -303,7 +306,8 @@ class _FlightSearchResultWidgetState extends State<FlightSearchResultWidget> {
       Text(" $connectionsStr"),
     ]);
   }
-
+  /// returns a widget displaying the number of connections of the return flight
+  /// if there are no connections, nothing is displayed.
   Widget getReturnFlightConnectionsRow() {
     String connectionsStr = "";
     String numConnectionStr = "";
