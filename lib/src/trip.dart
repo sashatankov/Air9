@@ -14,6 +14,7 @@ class FlightTrip {
     this.flights.addAll(flights);
   }
 
+  /// a constructor creates a [FlightTrip] object from json
   factory FlightTrip.fromJSON(List<dynamic> flightsAsJson) {
     List<Flight> flights = List<Flight>();
     for (var flightAsJson in flightsAsJson) {
@@ -38,16 +39,22 @@ class FlightTrip {
   /// returns the city where the trip ends, i.e the last city lands
   String get destinationCity => this.flights.last.arrivalCity;
 
+  /// returns the departure airport of the first flight in the trip
   String get originAirport => this.flights.first.departureAirport;
 
+  /// returns the arrival airport of the last flight in the trip
   String get destinationAirport => this.flights.last.arrivalAirport;
 
+  /// returns the departure time of the first flight in the trip
   String get departureTime => this.flights.first.departureTime;
 
+  /// returns the arrival time of the last flight in the trip
   String get arrivalTime => this.flights.last.arrivalTime;
 
+  /// returns the departure date of the first flight in the trip
   String get departureDate => this.flights.first.detartureDate;
 
+  /// returns the arrival date of the last flight in the trip
   String get arrivalDate => this.flights.last.arrivalDate;
 
   /// returns a list of flights that are connection flights in the trip
