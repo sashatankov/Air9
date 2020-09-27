@@ -25,6 +25,7 @@ const Map<String, String> apiKeys = {
   "Amadeus Secret": "5H3xVANAAdOAab2k"
 };
 
+/// returns the authorization key for the amadeus api
 Future<String> getAuthorizationKey() async {
   String url = "https://${apiHosts[amadeusStr]}/v1/security/oauth2/token";
   http.Response response = await http.post(url, headers: {
@@ -176,6 +177,8 @@ Map<String, dynamic> getFlightDataEntryFromQuote(
   return flightDataEntry;
 }
 
+/// return a list of all flights from one itinerary
+/// the flights are connection flights of one big flight itinerary
 List<Map<String, String>> getFlightsDataFromItinerary(
     dynamic itinerary, dynamic responseBody) {
   List<Map<String, String>> flightsData = List<Map<String, String>>();
@@ -186,6 +189,7 @@ List<Map<String, String>> getFlightsDataFromItinerary(
   return flightsData;
 }
 
+/// retrieves and returns data about one flight in the itinerary 
 Map<String, String> getPrimaryFlightDataFromItinerary(
     dynamic itinerary, dynamic responseBody) {
   Map<String, String> flightDataEntry = Map<String, String>();
