@@ -56,7 +56,9 @@ class _FlightSearchResultDetailsScreenState
       children: <Widget>[
         this.getPrimaryFlightItineraryDetails(),
         this.getReturnFlightItineraryDetails(),
-        Container(height: 75), // dummy container, in order to see befing the order button
+        Container(
+            height:
+                75), // dummy container, in order to see befing the order button
       ],
     );
   }
@@ -76,18 +78,24 @@ class _FlightSearchResultDetailsScreenState
   }
 
   Widget getFlightSegmentDetails(Flight flight) {
-    return Column(
-      children: <Widget>[
-        Container(
-            padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-            height: 200,
-            child: this.getDepartureDetails(flight)),
-        Container(
-          padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-          height: 200,
-          child: this.getArrivalDetails(flight),
+    return Container(
+      margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
+      child: Card(
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+              height: 200,
+              child: this.getDepartureDetails(flight),
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+              height: 200,
+              child: this.getArrivalDetails(flight),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -212,9 +220,26 @@ class _FlightSearchResultDetailsScreenState
     );
   }
 
+  TextStyle getWaitingTimeStyle() {
+    return TextStyle(
+      fontWeight: FontWeight.w500
+    );
+  }
+
   List<Widget> getFlightSegmentList(FlightTrip trip) {
     List<Flight> flights = trip.flights;
-    return flights.map((Flight e) => this.getFlightSegmentDetails(e)).toList();
+    List<Widget> widgets = List<Widget>();
+    var flightDetailsWidgets =
+        flights.map((Flight e) => this.getFlightSegmentDetails(e)).toList();
+    var waitingTimesWidgets = this.getWaitingTimesTextWidgets(trip);
+
+    for (int i = 0; i < waitingTimesWidgets.length; ++i) {
+      widgets.add(flightDetailsWidgets[i]);
+      widgets.add(waitingTimesWidgets[i]);
+    }
+    widgets.add(flightDetailsWidgets.last);
+
+    return widgets;
   }
 
   FlightSearchResult get searchResult => this.widget.searchResult;
@@ -227,5 +252,70 @@ class _FlightSearchResultDetailsScreenState
     NumberFormat format =
         NumberFormat.simpleCurrency(name: this.searchResult.currency);
     return "${format.currencySymbol}$text";
+  }
+
+  List<Widget> getWaitingTimesTextWidgets(FlightTrip trip) {
+    return this
+        .getWaitingTimesText(trip)
+        .map((e) => this.getWaitingTimeWidget(e))
+        .toList();
+  }
+
+  Widget getWaitingTimeWidget(String waitingTime) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Waiting Time "),
+          Text(
+            waitingTime,
+            style: this.getWaitingTimeStyle(),
+          )
+        ],
+      ),
+    );
+  }
+
+  List<String> getWaitingTimesText(FlightTrip trip) {
+    List<Duration> waitingTimes = this.getWaitingTimesBetweenFlights(trip);
+    return waitingTimes.map((e) => this.getWaitingTimeMessage(e)).toList();
+  }
+
+  List<Duration> getWaitingTimesBetweenFlights(FlightTrip trip) {
+    List<Duration> times = List<Duration>();
+    Duration duration;
+    var flights = trip.flights;
+    for (int i = 0; i < flights.length - 1; ++i) {
+      duration = flights[i + 1].departureAt.difference(flights[i].arrivalAt);
+      times.add(duration);
+    }
+
+    return times;
+  }
+
+  String getWaitingTimeMessage(Duration duration) {
+    String message = "";
+    int hour = duration.inHours;
+    int minute = duration.inMinutes - (hour * 60);
+
+    if (hour > 0) {
+      message = "$hour ";
+      if (hour == 1) {
+        message += "hour ";
+      } else {
+        message += "hours ";
+      }
+    }
+
+    if (minute > 0) {
+      message += "$minute ";
+      if (minute == 1) {
+        message += "minute";
+      } else {
+        message += "minutes";
+      }
+    }
+
+    return message;
   }
 }
