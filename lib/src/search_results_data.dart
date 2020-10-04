@@ -7,33 +7,39 @@ import 'package:Air9/src/flight_search.dart' show FlightSearchQuery;
 const String skyScannerStr = "Sky Scanner";
 const String tripAdvisorStr = "TripAdvisor";
 const String rapidStr = "rapid";
-const String amadeusStr = "Amadeus";
-const String amadeusClient = "Amadeus Client";
-const String amadeusSecret = "Amadeus Secret";
+const String amadeusTestStr = "Amadeus Test";
+const String amadeusProdStr = "Amadeus Production";
+const String amadeusTestClient = "Amadeus Test Client";
+const String amadeusTestSecret = "Amadeus Test Secret";
+const String amadeusProdClient = "Amadeus Production Client";
+const String amadeusProdSecret = "Amadeus Production Secret";
 
 // a list of api host to retreive data from
 const Map<String, String> apiHosts = {
   "Sky Scanner": "skyscanner-skyscanner-flight-search-v1.p.rapidapi.com",
   "TripAdvisor": "tripadvisor1.p.rapidapi.com",
-  "Amadeus": "test.api.amadeus.com"
+  "Amadeus Test": "test.api.amadeus.com",
+  "Amadeus Production": "api.amadeus.com"
 };
 
 // a list of keys to access the apis
 const Map<String, String> apiKeys = {
   "rapid": "af68c74026mshacfcc9302076c22p1787cfjsn6a661cfe6bbb",
-  "Amadeus Client": "iSuJip6SkOEetpUEfxYnNtNfDlk2C1Ec",
-  "Amadeus Secret": "5H3xVANAAdOAab2k"
+  "Amadeus Test Client": "iSuJip6SkOEetpUEfxYnNtNfDlk2C1Ec",
+  "Amadeus Test Secret": "5H3xVANAAdOAab2k",
+  "Amadeus Production Client": "qE4tjcIEwiWb4opB32asLermUnhk10NH",
+  "Amadeus Production Secret": "o7DSBnJem2OpBUar"
 };
 
 /// returns the authorization key for the amadeus api
 Future<String> getAuthorizationKey() async {
-  String url = "https://${apiHosts[amadeusStr]}/v1/security/oauth2/token";
+  String url = "https://${apiHosts[amadeusProdStr]}/v1/security/oauth2/token";
   http.Response response = await http.post(url, headers: {
     "Content-Type": "application/x-www-form-urlencoded"
   }, body: {
     "grant_type": "client_credentials",
-    "client_id": apiKeys[amadeusClient],
-    "client_secret": apiKeys[amadeusSecret]
+    "client_id": apiKeys[amadeusProdClient],
+    "client_secret": apiKeys[amadeusProdSecret]
   });
 
   dynamic body = response.body;
@@ -88,9 +94,9 @@ String getFlightOffersURL(
     int adultPassengers = 1,
     bool nonStop = false}) {
   if (returnDate == "") {
-    return "https://${apiHosts[amadeusStr]}/v2/shopping/flight-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&currencyCode=$currencyCode&max=25&nonStop=$nonStop";
+    return "https://${apiHosts[amadeusProdStr]}/v2/shopping/flight-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&currencyCode=$currencyCode&max=10&nonStop=$nonStop";
   }
-  return "https://${apiHosts[amadeusStr]}/v2/shopping/flight-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&returnDate=$returnDate&currencyCode=$currencyCode&max=25&nonStop=$nonStop";
+  return "https://${apiHosts[amadeusProdStr]}/v2/shopping/flight-offers?originLocationCode=$originCode&destinationLocationCode=$destinationCode&departureDate=$departureDate&adults=$adultPassengers&returnDate=$returnDate&currencyCode=$currencyCode&max=10&nonStop=$nonStop";
 }
 
 /// returns the url to make a request from, in order to get
@@ -189,7 +195,7 @@ List<Map<String, String>> getFlightsDataFromItinerary(
   return flightsData;
 }
 
-/// retrieves and returns data about one flight in the itinerary 
+/// retrieves and returns data about one flight in the itinerary
 Map<String, String> getPrimaryFlightDataFromItinerary(
     dynamic itinerary, dynamic responseBody) {
   Map<String, String> flightDataEntry = Map<String, String>();
