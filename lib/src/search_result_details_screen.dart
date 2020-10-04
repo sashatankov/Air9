@@ -95,6 +95,10 @@ class _FlightSearchResultDetailsScreenState
             ),
           ],
         ),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+        ),
+        elevation: 5.0,
       ),
     );
   }
