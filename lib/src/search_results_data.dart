@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:Air9/src/search_results_screen.dart' show FlightSearchResults;
 import 'package:Air9/src/flight_search.dart' show FlightSearchQuery;
+import 'package:Air9/src/storage.dart' show IataCodesStorage;
 
 const String skyScannerStr = "Sky Scanner";
 const String tripAdvisorStr = "TripAdvisor";
@@ -30,6 +31,8 @@ const Map<String, String> apiKeys = {
   "Amadeus Production Client": "qE4tjcIEwiWb4opB32asLermUnhk10NH",
   "Amadeus Production Secret": "o7DSBnJem2OpBUar"
 };
+
+IataCodesStorage iataCodeCache;
 
 /// returns the authorization key for the amadeus api
 Future<String> getAuthorizationKey() async {
@@ -79,6 +82,29 @@ Future<FlightSearchResults> fetchFlights(FlightSearchQuery query) async {
   return FlightSearchResults.fromJSON(data);
 }
 
+Future<String> fetchCityName(String cityCode) async {
+  if (iataCodeCache == null) {
+    iataCodeCache = IataCodesStorage();
+  }
+
+  
+
+  String authorizationKey = await getAuthorizationKey();
+  String url = getLocationsURL(cityCode, "CITY");
+  final response = await http
+      .get(url, headers: {"Authorization": "Bearer $authorizationKey"});
+  final responseBody = json.decode(response.body);
+  String cityName = responseBody["data"]["address"]["cityName"];
+  await iataCodeCache.writeCityName(cityCode, cityName);
+  return cityName;
+
+
+}
+
+Future<String> fetchCountryName(String countryCode) {}
+
+Future<String> fetchAirportName(String airportCode) {}
+
 /// return a string representation of a date
 String formattedDate(DateTime date) {
   return "${date.year.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -106,6 +132,10 @@ String getAirportsURL(String placeName,
     String resultsCurrency = "USD",
     String resultsLanguage = "en-US"}) {
   return "https://${apiHosts[tripAdvisorStr]}/airports/search/?locale=$resultsLanguage&query=$placeName";
+}
+
+String getLocationsURL(String code, String subType) {
+  return "https://${apiHosts[amadeusProdStr]}/v1/reference-data/locations?subType=$subType&keyword=$code";
 }
 
 /// makes an api request to retreive the airport codes according
