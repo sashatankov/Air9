@@ -4,6 +4,12 @@ import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 
 class IataCodesStorage {
+  Map<String, dynamic> cache;
+
+  IataCodesStorage() {
+    cache = Map<String, dynamic>();
+  }
+
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -60,7 +66,7 @@ class IataCodesStorage {
     }
   }
 
-  Future<File> writeCityName(String cityCode, String cityName) async {
+  void writeCityName(String cityCode, String cityName) async {
     try {
       Map<String, dynamic> codes;
       var file = await _localFile;
@@ -70,19 +76,16 @@ class IataCodesStorage {
       String content = await file.readAsString();
       if (content.isNotEmpty) {
         codes = json.decode(content);
-      } else {
-        codes = Map<String, dynamic>();
+        this.cache.addAll(codes);
       }
-      codes[cityCode] = cityName;
-      content = json.encode(codes);
+      this.cache[cityCode] = cityName;
 
-      return file.writeAsString(content);
     } catch (e) {
       throw "Unexpected Error occured";
     }
   }
 
-  Future<File> writeAirportName(String airportCode, String airportName) async {
+  void writeAirportName(String airportCode, String airportName) async {
     try {
       Map<String, dynamic> codes;
       var file = await _localFile;
@@ -92,19 +95,16 @@ class IataCodesStorage {
       String content = await file.readAsString();
       if (content.isNotEmpty) {
         codes = json.decode(content);
-      } else {
-        codes = Map<String, dynamic>();
+        this.cache.addAll(codes);
       }
-      codes[airportCode] = airportName;
-      content = json.encode(codes);
+      this.cache[airportCode] = airportName;
 
-      return file.writeAsString(content);
     } catch (e) {
       throw "Unexpected Error occured";
     }
   }
 
-  Future<File> writeCountryName(String countryCode, String countryName) async {
+  void writeCountryName(String countryCode, String countryName) async {
     try {
       Map<String, dynamic> codes;
       var file = await _localFile;
@@ -114,15 +114,18 @@ class IataCodesStorage {
       String content = await file.readAsString();
       if (content.isNotEmpty) {
         codes = json.decode(content);
-      } else {
-        codes = Map<String, dynamic>();
+        this.cache.addAll(codes);
       }
-      codes[countryCode] = countryName;
-      content = json.encode(codes);
+      this.cache[countryCode] = countryName;
 
-      return file.writeAsString(content);
     } catch (e) {
       throw "Unexpected Error occured";
     }
+  }
+
+  void dispose() async {
+    var file = await _localFile;
+    var content = json.encode(this.cache);
+    await file.writeAsString(content);
   }
 }
