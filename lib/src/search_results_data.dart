@@ -88,37 +88,40 @@ Future<String> fetchCityName(String cityCode) async {
     iataCodeCache = IataCodesStorage();
   }
   try {
-    cityName = await iataCodeCache.getCityName(cityCode);
+    cityName = await iataCodeCache.getCityName("CITY $cityCode");
   } catch (e) {
     // api call
+    print("Calling api...");
     String authorizationKey = await getAuthorizationKey();
     String url = getLocationsURL(cityCode, "CITY");
     final response = await http
         .get(url, headers: {"Authorization": "Bearer $authorizationKey"});
     final responseBody = json.decode(response.body);
-    cityName = responseBody["data"]["address"]["cityName"];
-    iataCodeCache.writeCityName(cityCode, cityName);
+    cityName = responseBody["data"][0]["address"]["cityName"];
+    iataCodeCache.writeCityName("CITY $cityCode", cityName);
   }
 
   return cityName;
 }
 
-Future<String> fetchCountryName(String countryCode) async {
+Future<String> fetchCountryName(String airportCode) async {
   String countryName;
   if (iataCodeCache == null) {
     iataCodeCache = IataCodesStorage();
   }
   try {
-    countryName = await iataCodeCache.getCityName(countryCode);
+    countryName = await iataCodeCache.getCityName("COUNTRY $airportCode");
   } catch (e) {
     // api call
+    print("Calling api...");
     String authorizationKey = await getAuthorizationKey();
-    String url = getLocationsURL(countryCode, "CITY");
+    String url = getLocationsURL(airportCode, "AIRPORT");
     final response = await http
         .get(url, headers: {"Authorization": "Bearer $authorizationKey"});
     final responseBody = json.decode(response.body);
-    countryName = responseBody["data"]["address"]["cityName"];
-    iataCodeCache.writeCityName(countryCode, countryName);
+    countryName = responseBody["data"][0]["address"]["countryName"];
+    
+    iataCodeCache.writeCityName("COUNTRY $airportCode", countryName);
   }
 
   return countryName;
@@ -130,16 +133,17 @@ Future<String> fetchAirportName(String airportCode) async {
     iataCodeCache = IataCodesStorage();
   }
   try {
-    airportName = await iataCodeCache.getCityName(airportCode);
+    airportName = await iataCodeCache.getCityName("AIRPORT $airportCode");
   } catch (e) {
     // api call
+    print("Calling api...");
     String authorizationKey = await getAuthorizationKey();
-    String url = getLocationsURL(airportCode, "CITY");
+    String url = getLocationsURL(airportCode, "AIRPORT");
     final response = await http
         .get(url, headers: {"Authorization": "Bearer $authorizationKey"});
     final responseBody = json.decode(response.body);
-    airportName = responseBody["data"]["address"]["cityName"];
-    iataCodeCache.writeCityName(airportCode, airportName);
+    airportName = responseBody["data"][0]["name"];
+    iataCodeCache.writeCityName("AIRPORT $airportCode", airportName);
   }
 
   return airportName;
